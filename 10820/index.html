@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="NEON PUZZLE - 8x8 네온 블록 퍼즐 미니게임. 가로/세로 라인을 채워 폭발적인 콤보와 올클리어를 달성해보세요!">
+  <meta name="theme-color" content="#070a14">
+  <title>NEON PUZZLE - 8x8 네온 블록 퍼즐</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-cyber">
+
+  <!-- Dynamic Animated Neon Background Layer -->
+  <div class="bg-ambient-layer">
+    <div class="bg-glow-orb bg-glow-1"></div>
+    <div class="bg-glow-orb bg-glow-2"></div>
+    <div class="bg-cyber-grid"></div>
+  </div>
+
+  <!-- 2D Particle Effects Overlay -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- ALL CLEAR Celebration Overlay Banner -->
+  <div id="all-clear-banner" class="all-clear-banner">
+    <div class="all-clear-title">✨ ALL CLEAR! ✨</div>
+    <div class="all-clear-sub">+1,000 BONUS &amp; THEME UNLOCKED</div>
+  </div>
+
+  <!-- Main Game Container -->
+  <main class="game-wrapper">
+    <!-- Top Header HUD -->
+    <header class="header-bar">
+      <div class="brand-section">
+        <h1 class="game-title-text">NEON PUZZLE</h1>
+        <span id="theme-badge" class="theme-badge">THEME: CYBER NEON</span>
+      </div>
+
+      <div class="score-cluster">
+        <div class="score-card">
+          <span class="score-card-label">SCORE</span>
+          <span id="score-display" class="score-card-value highlight">0</span>
+        </div>
+        <div class="score-card">
+          <span class="score-card-label">BEST</span>
+          <span id="high-score-display" class="score-card-value gold">0</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="btn-theme" class="icon-btn" aria-label="배경 테마 변경" title="배경 테마 전환">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.28 19.34 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+        <button id="btn-header-restart" class="icon-btn" aria-label="게임 다시 시작" title="새 게임">
+          <svg viewBox="0 0 24 24">
+            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+          </svg>
+        </button>
+        <button id="btn-mute" class="icon-btn" aria-label="사운드 켜기/끄기" title="소리 토글">
+          <svg id="sound-icon" viewBox="0 0 24 24">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Dynamic Combo Meter & Popup Area -->
+    <div class="combo-area">
+      <div id="combo-meter" class="combo-meter-pill hidden">
+        <span class="fire-icon">🔥</span>
+        <span id="combo-count-text">2x CLEAR!</span>
+        <span id="combo-dots" class="combo-dots" title="남은 콤보 유지 턴">
+          <span class="dot">●</span><span class="dot">●</span><span class="dot">●</span>
+        </span>
+        <span id="combo-multiplier-text" class="multiplier-badge">+75%</span>
+      </div>
+      <div id="combo-popup" class="combo-popup">2x CLEAR!</div>
+    </div>
+
+    <!-- 8x8 Board Container -->
+    <section class="board-container-outer" aria-label="8x8 블록 퍼즐 보드">
+      <div id="board-container" class="board-container"></div>
+    </section>
+
+    <!-- Bottom Dock (3 Slots) -->
+    <footer class="dock-container" aria-label="사용 가능한 블록 슬롯">
+      <div id="slot-0" class="dock-slot" data-slot="0"></div>
+      <div id="slot-1" class="dock-slot" data-slot="1"></div>
+      <div id="slot-2" class="dock-slot" data-slot="2"></div>
+    </footer>
+  </main>
+
+  <!-- Game Over Modal -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal-card">
+      <h2 class="modal-title">GAME OVER</h2>
+      <p class="modal-subtitle">더 이상 블록을 놓을 수 있는 자리가 없습니다!</p>
+
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-label">Final Score</div>
+          <div id="modal-score" class="stat-value highlight">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Best Score</div>
+          <div id="modal-best" class="stat-value gold">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Lines Cleared</div>
+          <div id="modal-lines" class="stat-value">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Max Combo</div>
+          <div id="modal-combos" class="stat-value">0</div>
+        </div>
+      </div>
+
+      <button id="btn-restart" class="btn-primary" type="button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+        </svg>
+        PLAY AGAIN
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="game.js"></script>
+</body>
+</html>
