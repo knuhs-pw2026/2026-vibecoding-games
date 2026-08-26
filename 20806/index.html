@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>야간 자율학습의 비밀: 닫힌 학교 탈출</title>
+  <meta name="description" content="고등학교 동아리 제작 방탈출 / 텍스트 어드벤처 웹 게임. 어두운 학교에 갇힌 당신, 단서를 풀고 탈출하라!">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- CRT 레트로 스캔라인 & 비네트 오버레이 -->
+  <div id="crt-screen-overlay" class="crt-overlay"></div>
+
+  <!-- 메인 게임 컨테이너 -->
+  <div id="game-container">
+    
+    <!-- 1. 상단 네비게이션 & 상태 HUD -->
+    <header class="game-header">
+      <div class="header-left">
+        <span class="game-title">ESCAPE: SCHOOL</span>
+        <div class="hud-location-badge">
+          <span id="hud-floor-name" class="hud-floor">본관 3층</span>
+          <span id="hud-location-name" class="hud-location">3학년 4반 교실</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <div class="timer-box">
+          <span class="timer-icon">⏳</span>
+          <span id="hud-timer-display" class="timer-digits">30:00</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button id="btn-open-map" class="hud-btn" title="학교 약도 보기">
+          <span class="btn-icon">🗺️</span> <span>지도</span>
+        </button>
+        <button id="btn-open-inventory" class="hud-btn" title="가방 열기">
+          <span class="btn-icon">🎒</span> <span>가방 (<span id="inventory-count-badge">0</span>)</span>
+        </button>
+        <button id="btn-open-log" class="hud-btn" title="대화 기록 보기">
+          <span class="btn-icon">📜</span> <span>기록</span>
+        </button>
+        <button id="btn-open-save" class="hud-btn" title="저장 및 불러오기">
+          <span class="btn-icon">💾</span> <span>저장</span>
+        </button>
+        <button id="btn-open-settings" class="hud-btn" title="게임 설정">
+          <span class="btn-icon">⚙️</span>
+        </button>
+        <button id="btn-open-guide" class="hud-btn" title="동아리 제작 가이드">
+          <span class="btn-icon">💡</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. 게임 메인 영역 -->
+    <main class="game-main">
+      <!-- 2-1. 비주얼 뷰포트 (배경 & 상호작용 핀) -->
+      <section class="viewport-section">
+        <img id="scene-background" class="scene-image" src="assets/images/classroom.jpg" alt="장소 배경">
+        <div id="scene-hotspots-layer" class="hotspots-layer"></div>
+      </section>
+
+      <!-- 2-2. 대화 & 지문 박스 및 선택지 -->
+      <section class="dialogue-section">
+        <div id="dialogue-speaker" class="dialogue-speaker-badge">나 (독백)</div>
+        <div id="dialogue-box" class="dialogue-content-box" title="클릭하여 전체 텍스트 즉시 표시">
+          <p id="dialogue-text"></p>
+        </div>
+        <div id="dialogue-choices-container" class="choices-container"></div>
+      </section>
+    </main>
+
+    <!-- 3. 하단 퀵 인벤토리 도크 -->
+    <footer class="inventory-dock">
+      <div class="dock-left-label">
+        <span>QUICK INVENTORY</span>
+      </div>
+      <div id="quick-inventory-items" class="quick-slots-container"></div>
+    </footer>
+  </div>
+
+  <!-- 토스트 알림 컨테이너 -->
+  <div id="toast-container"></div>
+
+  <!-- =========================================================================
+       모달 팝업 모음 (Modals)
+       ========================================================================= -->
+
+  <!-- [Modal 1] 4자리 키패드 자물쇠 모달 -->
+  <div id="keypad-modal" class="game-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="keypad-title" class="modal-title">비밀번호 자물쇠</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="keypad-subtitle" style="text-align:center; color: var(--text-muted); margin-bottom: 16px; font-size: 0.9rem;"></p>
+        <div class="keypad-wrapper">
+          <div id="keypad-display" class="keypad-display-box">
+            <span id="keypad-display-text" class="keypad-digits">_ _ _ _</span>
+          </div>
+          <div class="keypad-grid">
+            <button class="keypad-btn" data-num="1">1</button>
+            <button class="keypad-btn" data-num="2">2</button>
+            <button class="keypad-btn" data-num="3">3</button>
+            <button class="keypad-btn" data-num="4">4</button>
+            <button class="keypad-btn" data-num="5">5</button>
+            <button class="keypad-btn" data-num="6">6</button>
+            <button class="keypad-btn" data-num="7">7</button>
+            <button class="keypad-btn" data-num="8">8</button>
+            <button class="keypad-btn" data-num="9">9</button>
+            <button id="keypad-btn-clear" class="keypad-btn action-btn clear">CLR</button>
+            <button class="keypad-btn" data-num="0">0</button>
+            <button id="keypad-btn-submit" class="keypad-btn action-btn submit">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [Modal 2] 전선 배선 퍼즐 모달 -->
+  <div id="wire-puzzle-modal" class="game-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="wire-puzzle-title" class="modal-title">배전반 전선 연결</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="wire-puzzle-subtitle" style="text-align:center; color: var(--text-muted); margin-bottom: 16px; font-size: 0.88rem;"></p>
+        <div class="wire-puzzle-container">
+          <div id="wire-board" class="wire-slots-box">
+            <div class="wire-target-slot empty" data-slot="0">[1단계 빈 단자]</div>
+            <div class="wire-target-slot empty" data-slot="1">[2단계 빈 단자]</div>
+            <div class="wire-target-slot empty" data-slot="2">[3단계 빈 단자]</div>
+            <div class="wire-target-slot empty" data-slot="3">[4단계 빈 단자]</div>
+          </div>
+          <div class="wire-sources-box">
+            <button class="wire-source" data-color="red">🔴 빨간 전선 (R)</button>
+            <button class="wire-source" data-color="yellow">🟡 노란 전선 (Y)</button>
+            <button class="wire-source" data-color="blue">🔵 파란 전선 (B)</button>
+            <button class="wire-source" data-color="green">🟢 초록 전선 (G)</button>
+          </div>
+          <button id="wire-reset-btn" class="wire-reset-btn">🔄 배선 초기화</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [Modal 3] 아이템 전체 보기 / 가방 모달 -->
+  <div id="inventory-modal" class="game-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">소지품 가방</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="modal-inventory-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [Modal 4] 아이템 상세 조사 모달 -->
+  <div id="item-inspect-modal" class="game-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">아이템 정밀 조사</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="item-inspect-content">
+          <div id="inspect-item-icon" class="inspect-icon-large">🔦</div>
+          <h4 id="inspect-item-name" class="inspect-name">손전등</h4>
+          <span id="inspect-item-category" class="inspect-category">[도구]</span>
+          <p id="inspect-item-desc" class="inspect-desc"></p>
+          <p id="inspect-item-hint" class="inspect-hint"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [Modal 5] 학교 평면도 지도 모달 -->
+  <div id="map-modal" class="game-modal">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title">학교 본관 약도</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex; flex-direction:column; gap:16px; font-size:0.95rem;">
+          <!-- 3층 -->
+          <div style="background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:12px;">
+            <div style="color:var(--color-gold); font-weight:700; margin-bottom:8px;">[3층]</div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; text-align:center;">
+              <div style="padding:10px; background:rgba(0,242,255,0.1); border:1px solid var(--color-primary); border-radius:8px; font-weight:700;">3-4반 교실 (시작)</div>
+              <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px;">3층 복도 & 분전함</div>
+              <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px;">교무실 & 금고</div>
+            </div>
+          </div>
+          <!-- 2층 -->
+          <div style="background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:12px;">
+            <div style="color:var(--color-gold); font-weight:700; margin-bottom:8px;">[2층]</div>
+            <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; text-align:center;">
+              <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px;">2층 복도</div>
+              <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px;">과학실 (시약 & 타임캡슐)</div>
+            </div>
+          </div>
+          <!-- 1층 -->
+          <div style="background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:12px;">
+            <div style="color:var(--color-gold); font-weight:700; margin-bottom:8px;">[1층]</div>
+            <div style="text-align:center; padding:10px; background:rgba(251,191,36,0.1); border:1px solid var(--color-gold); border-radius:8px; font-weight:700;">
+              🚪 학교 정문 (최종 탈출구)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [Modal 6] 대화 기록 (Log) 모달 -->
+  <div id="log-modal" class="game-modal">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title">대화 및 조사 기록</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="log-modal-content" style="display:flex; flex-direction:column; gap:12px; max-height:400px; overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [Modal 7] 세이브 / 로드 모달 -->
+  <div id="saveload-modal" class="game-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">진행 상황 저장 / 불러오기</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <!-- Slot 1 -->
+          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:700; color:#fff;">슬롯 1</div>
+              <div id="save-slot1-info" style="font-size:0.85rem; color:var(--text-muted);">빈 슬롯</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button id="btn-save-slot1" class="hud-btn" style="background:var(--color-primary); color:#000; font-weight:700;">저장</button>
+              <button id="btn-load-slot1" class="hud-btn">불러오기</button>
+            </div>
+          </div>
+          <!-- Slot 2 -->
+          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:700; color:#fff;">슬롯 2</div>
+              <div id="save-slot2-info" style="font-size:0.85rem; color:var(--text-muted);">빈 슬롯</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button id="btn-save-slot2" class="hud-btn" style="background:var(--color-primary); color:#000; font-weight:700;">저장</button>
+              <button id="btn-load-slot2" class="hud-btn">불러오기</button>
+            </div>
+          </div>
+          <!-- Slot 3 -->
+          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:700; color:#fff;">슬롯 3</div>
+              <div id="save-slot3-info" style="font-size:0.85rem; color:var(--text-muted);">빈 슬롯</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button id="btn-save-slot3" class="hud-btn" style="background:var(--color-primary); color:#000; font-weight:700;">저장</button>
+              <button id="btn-load-slot3" class="hud-btn">불러오기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [Modal 8] 설정 모달 -->
+  <div id="settings-modal" class="game-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">환경 설정</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span>음향 음소거 (Mute)</span>
+            <input type="checkbox" id="setting-mute-toggle" style="width:20px; height:20px; cursor:pointer;">
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span>음향 볼륨</span>
+            <input type="range" id="setting-volume-slider" min="0" max="100" value="60" style="cursor:pointer;">
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span>CRT 레트로 필터</span>
+            <input type="checkbox" id="setting-crt-toggle" checked style="width:20px; height:20px; cursor:pointer;">
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span>텍스트 출력 속도</span>
+            <select id="setting-speed-select" style="background:#000; color:#fff; border:1px solid rgba(255,255,255,0.2); padding:6px 12px; border-radius:6px; cursor:pointer;">
+              <option value="normal">보통</option>
+              <option value="fast">빠름</option>
+              <option value="instant">즉시 출력</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [Modal 9] 동아리 부원 가이드 모달 -->
+  <div id="guide-modal" class="game-modal">
+    <div class="modal-card" style="max-width: 640px;">
+      <div class="modal-header">
+        <h3 class="modal-title">💡 동아리 활동 & 커스텀 가이드</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="font-size:0.92rem; line-height:1.7; color:var(--text-main);">
+        <h4 style="color:var(--color-primary); margin-bottom:6px;">1. 새로운 방(Scene)이나 대사 추가하기</h4>
+        <p style="margin-bottom:12px;">
+          <code>src/data/story.js</code> 파일의 <code>scenes</code> 객체에 새로운 방 ID를 추가하고, <code>text</code>, <code>choices</code>, <code>hotspots</code>를 작성하면 즉시 게임에 반영됩니다.
+        </p>
+
+        <h4 style="color:var(--color-gold); margin-bottom:6px;">2. 자물쇠 및 비밀번호 정답 변경</h4>
+        <p style="margin-bottom:12px;">
+          <code>story.js</code>의 <code>puzzles</code> 섹션에서 <code>correctAnswer</code> 값을 원하는 번호(예: 우리 학교 설립일, 선생님 생일 등)로 바꾸면 됩니다.
+        </p>
+
+        <h4 style="color:var(--color-accent); margin-bottom:6px;">3. 학교 축제 부스 운영 팁</h4>
+        <p>
+          - <code>index.html</code>을 브라우저 전체 화면(F11)으로 띄워두고 태블릿이나 노트북으로 플레이 부스를 운영할 수 있습니다.<br>
+          - <strong>GitHub Pages</strong>에 업로드하면 QR 코드를 만들어 친구들이 각자 스마트폰으로 플레이하게 할 수 있습니다!
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- [Modal 10] 게임 엔딩 모달 -->
+  <div id="ending-modal" class="game-modal">
+    <div class="modal-card ending-modal-card">
+      <div class="modal-header" style="justify-content:center;">
+        <span id="ending-type-badge" class="ending-badge ending-true">TRUE ENDING</span>
+      </div>
+      <div class="modal-body">
+        <h2 id="ending-title" style="color:#fff; font-size:1.5rem; margin-bottom:14px; font-weight:800;">탈출 성공</h2>
+        <div id="ending-desc" style="font-size:1rem; line-height:1.7; color:var(--text-main); margin-bottom:20px; background:rgba(0,0,0,0.4); padding:16px; border-radius:12px;"></div>
+        
+        <div class="ending-stats-grid">
+          <div class="stat-item">
+            <div class="stat-label">탈출 소요 시간</div>
+            <div id="ending-stat-time" class="stat-val">12분 30초</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">획득한 아이템</div>
+            <div id="ending-stat-items" class="stat-val">5개</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">수수께끼 달성도</div>
+            <div id="ending-stat-clues" class="stat-val">100%</div>
+          </div>
+        </div>
+
+        <button class="restart-game-btn" onclick="window.game.restart()">🔄 처음부터 다시 도전하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스크립트 로드 순서 -->
+  <script src="src/data/story.js"></script>
+  <script src="src/js/sound.js"></script>
+  <script src="src/js/inventory.js"></script>
+  <script src="src/js/puzzle.js"></script>
+  <script src="src/js/game.js"></script>
+</body>
+</html>
