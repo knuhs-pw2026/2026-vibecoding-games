@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corpse Dash - 지오메트리 & 데스 스텝 (10 Stages)</title>
+  <meta name="description" content="나의 죽음은 다음 발판이 된다! 시체를 밟고 장애물을 극복하는 2D 네온 퍼즐 플랫포머 게임">
+  <!-- Google Fonts: Orbitron & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-wrapper">
+    <!-- Top HUD Header -->
+    <header class="hud-header">
+      <div class="brand">
+        <span class="logo-cube"></span>
+        <h1 class="game-title">CORPSE <span class="accent-text">DASH</span></h1>
+      </div>
+      
+      <div class="stats-bar">
+        <div class="stat-badge" id="level-display">
+          <span class="stat-label">STAGE</span>
+          <span class="stat-value" id="current-stage-text">01 / 10</span>
+        </div>
+        <div class="stat-badge" id="corpse-display">
+          <span class="stat-label">CORPSE LIMIT</span>
+          <span class="stat-value" id="corpse-count-text">0 / 2</span>
+        </div>
+        <div class="stat-badge" id="death-display">
+          <span class="stat-label">DEATHS</span>
+          <span class="stat-value" id="death-count-text">0</span>
+        </div>
+        <div class="stat-badge" id="timer-display">
+          <span class="stat-label">TIME</span>
+          <span class="stat-value" id="time-text">00:00</span>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <button id="btn-sound" class="btn-icon" title="사운드 켜기/끄기 (M)">🔊</button>
+        <button id="btn-restart" class="btn-icon btn-danger" title="스테이지 초기화 (R)">↺</button>
+      </div>
+    </header>
+
+    <!-- Canvas Play Area -->
+    <div class="canvas-container">
+      <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+      <!-- Warning Toast for Limit Exceeded -->
+      <div id="warn-toast" class="warn-toast">⚠️ 시체 생성 한도 초과! (스테이지 리셋)</div>
+
+      <!-- Level Hint Floating Banner -->
+      <div id="level-hint" class="level-hint">
+        <span class="hint-icon">💡</span>
+        <span id="hint-text">가시에 몸을 던져 첫 번째 발판을 만드세요!</span>
+      </div>
+
+      <!-- Start / Title Screen Overlay -->
+      <div id="start-screen" class="overlay-screen active">
+        <div class="screen-box">
+          <div class="hero-logo">
+            <div class="hero-cube"></div>
+            <h2>CORPSE <span>DASH</span></h2>
+          </div>
+          <p class="tagline">"나의 희생은 다음 도전자를 위한 디딤돌이 된다."</p>
+          <div class="instructions-card">
+            <div class="ctrl-row">
+              <span class="key-badge">←</span> <span class="key-badge">→</span> 또는 <span class="key-badge">A</span> <span class="key-badge">D</span>
+              <span class="ctrl-desc">즉시 반응 좌우 이동 (관성 없음)</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="key-badge">↑</span> / <span class="key-badge">Space</span> / <span class="key-badge">W</span>
+              <span class="ctrl-desc">점프</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="key-badge">R</span>
+              <span class="ctrl-desc">스테이지 리셋 (시체 초기화)</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="key-badge">☠️</span>
+              <span class="ctrl-desc">같은 가시/시체 위에도 시체 탑 적재 가능!</span>
+            </div>
+          </div>
+          <button id="btn-play-game" class="btn-primary">게임 시작 (START)</button>
+        </div>
+      </div>
+
+      <!-- Level Clear Overlay -->
+      <div id="clear-screen" class="overlay-screen">
+        <div class="screen-box victory-box">
+          <div class="clear-title">STAGE COMPLETE!</div>
+          <p class="clear-sub" id="clear-stage-name">STAGE 01 돌파 성공</p>
+          <div class="clear-stats">
+            <div class="clear-stat-item">
+              <span class="label">소모된 시체 수</span>
+              <span class="val" id="stage-deaths-val">1 / 2</span>
+            </div>
+            <div class="clear-stat-item">
+              <span class="label">소요 시간</span>
+              <span class="val" id="stage-time-val">00:12</span>
+            </div>
+          </div>
+          <button id="btn-next-level" class="btn-primary btn-success">다음 스테이지 (NEXT)</button>
+        </div>
+      </div>
+
+      <!-- Game Victory Overlay (Final Clear) -->
+      <div id="all-clear-screen" class="overlay-screen">
+        <div class="screen-box victory-box gold">
+          <div class="clear-title">🏆 ALL 10 STAGES CLEARED! 🏆</div>
+          <p class="clear-sub">모든 장애물과 시련을 극복하고 완벽 탈출에 성공했습니다!</p>
+          <div class="clear-stats">
+            <div class="clear-stat-item">
+              <span class="label">총 희생 횟수</span>
+              <span class="val" id="total-deaths-val">12</span>
+            </div>
+            <div class="clear-stat-item">
+              <span class="label">총 플레이 시간</span>
+              <span class="val" id="total-time-val">01:45</span>
+            </div>
+          </div>
+          <button id="btn-replay-all" class="btn-primary">처음부터 다시하기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Controls & Stage Selector -->
+    <footer class="hud-footer">
+      <div class="stage-nav">
+        <span class="nav-label">스테이지:</span>
+        <div class="stage-buttons" id="stage-buttons-container">
+          <!-- Dynamically populated buttons (1~10) -->
+        </div>
+      </div>
+      <div class="tip-bar">
+        <span>⌨️ 팁: 가시에 닿아 남겨진 시체는 단단한 발판이 됩니다. 시체 위에 다시 점프해 2단 탑을 쌓을 수도 있습니다!</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
