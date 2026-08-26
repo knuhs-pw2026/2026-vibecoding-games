@@ -1653,7 +1653,120 @@
       document.getElementById('fb-daughter-tag').textContent = data.daughterTag;
 
       // Render Cutscene Dad & Daughter SVGs
-      document.getElemen    // ================= HIGH DETAIL ANIME VECTOR SPRITES =================
+      document.getElementById('fb-dad-svg-container').innerHTML = getDadSVG();
+      document.getElementById('fb-daughter-svg-container').innerHTML = getDaughterSVG(data.daughterAge);
+
+      // Display first dialogue line
+      renderFlashbackStep();
+
+      // Show modal
+      openModal('modal-flashback');
+    }
+
+    function renderFlashbackStep() {
+      const d = fbState.dialogues[fbState.step];
+      if (!d) return;
+
+      document.getElementById('fb-speaker-icon').textContent = d.icon;
+      document.getElementById('fb-speaker-text').textContent = d.name;
+      document.getElementById('fb-dialogue-line').textContent = d.text;
+      document.getElementById('fb-step-indicator').textContent = `대화 ${fbState.step + 1} / ${fbState.dialogues.length}`;
+
+      // Actor speaking states
+      const dadBox = document.getElementById('fb-actor-dad');
+      const daughterBox = document.getElementById('fb-actor-daughter');
+      if (d.speaker === 'dad') {
+        dadBox.className = 'fb-actor-box speaking';
+        daughterBox.className = 'fb-actor-box dimmed';
+      } else {
+        dadBox.className = 'fb-actor-box dimmed';
+        daughterBox.className = 'fb-actor-box speaking';
+      }
+
+      // Update next button text
+      const btn = document.getElementById('btn-fb-next');
+      if (fbState.step >= fbState.dialogues.length - 1) {
+        btn.textContent = '회상 종료 ✓';
+      } else {
+        btn.textContent = '다음 대화 ▶';
+      }
+    }
+
+    function nextFlashbackStep() {
+      playSFX('click');
+      if (fbState.step < fbState.dialogues.length - 1) {
+        fbState.step++;
+        playTone(440 + fbState.step * 60, 'triangle', 0.3, 0.15);
+        renderFlashbackStep();
+      } else {
+        // End flashback
+        fbState.active = false;
+        closeModal('modal-flashback');
+        if (currentFlashbackCallback) {
+          currentFlashbackCallback();
+          currentFlashbackCallback = null;
+        }
+      }
+    }
+
+    // ================= UI VIEW SWITCHING =================
+    function switchView(view) {
+      const gameView = document.getElementById('game-view');
+      const docView = document.getElementById('doc-view');
+      const btnGame = document.getElementById('btn-tab-game');
+      const btnDoc = document.getElementById('btn-tab-doc');
+
+      if (view === 'game') {
+        gameView.style.display = 'flex';
+        docView.style.display = 'none';
+        btnGame.classList.add('active');
+        btnDoc.classList.remove('active');
+      } else {
+        gameView.style.display = 'none';
+        docView.style.display = 'block';
+        btnGame.classList.remove('active');
+        btnDoc.classList.add('active');
+      }
+    }
+
+    function startGame() {
+      initAudio();
+      playSFX('unlock');
+      const titleScreen = document.getElementById('title-screen');
+      titleScreen.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+      titleScreen.style.opacity = '0';
+      titleScreen.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        titleScreen.style.display = 'none';
+      }, 800);
+    }
+
+    function setDialogue(speaker, icon, text) {
+      const bubbleSpeaker = document.getElementById('bubble-name');
+      const bubbleAvatar = document.getElementById('bubble-avatar');
+      const bubbleText = document.getElementById('bubble-text');
+      const bubble = document.getElementById('in-stage-bubble');
+
+      if (bubbleSpeaker) bubbleSpeaker.textContent = speaker;
+      if (bubbleAvatar) bubbleAvatar.textContent = icon;
+      if (bubbleText) bubbleText.textContent = text;
+
+      // Re-trigger pop animation
+      if (bubble) {
+        bubble.style.animation = 'none';
+        bubble.offsetHeight; // force reflow
+        bubble.style.animation = 'bubblePop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+      }
+
+      // Actor talking animation
+      const actor = document.getElementById('in-stage-character');
+      if (actor) {
+        actor.classList.add('actor-talking');
+        setTimeout(() => actor.classList.remove('actor-talking'), 1200);
+      }
+    }
+
+    // ================= HIGH DETAIL ANIME VECTOR SPRITES =================
     function getDadSVG() {
       return `
         <svg viewBox="0 0 140 220" width="100%" height="100%" style="overflow:visible;">
@@ -2414,142 +2527,6 @@
         addItem('졸업식 사진', '📷', '졸업식 날 딸 몰래 뒤에서 지켜보며 울던 아빠의 폴라로이드 사진');
       }
       setDialogue('딸 강하은 (20세)', '📷', '환하게 웃는 내 뒤에서 홀로 눈물을 닦는 아빠의 모습이 찍혀있어요...');
-    }
-
-    function openSafePuzzle() {
-      if (gameState.ch3.safeSolved) return;
-      openModal('modal-safe');
-    }
-
-    function checkSafeCode() {
-      const code = `${document.getElementById('s1').textContent}${document.getElementById('s2').textContent}${document.getElementById('s3').textContent}${document.getElementById('s4').textContent}`;
-      if (code === '1020') {
-        gameState.ch3.safeSolved = true;
-        closeModal('modal-safe');
-        playSFX('unlock');
-
-        const hs = document.getElementById('hs-safe');
-        if (hs) hs.classList.add('solved');
-        const tag = document.getElementById('hs-safe-tag');
-        if (tag) tag.textContent = '✓ 비밀 금고 (완료)';
-
-        // Trigger emotional departure flashback
-        triggerFlashback('ch3', () => {
-          addItem('전하지 못한 편지', '💌', '"하은아, 널 위해 일평생을 살아온 시간이 아빠에겐 가장 큰 축복이었단다."');
-          setDialogue('딸 강하은 (20세)', '💌', '금고 속 아빠의 편지... "하은아, 널 위한 일평생이 아빠에겐 가장 큰 축복이었단다."');
-          document.getElementById('ch3-door-icon').textContent = '🚪✨';
-        });
-      } else {
-        playSFX('error');
-        setDialogue('딸 강하은 (20세)', '🗄️', '비밀번호가 맞지 않아요. 코트 속 처방전의 졸업식 날짜 [1020]이에요.');
-      }
-    }율 렌치', '🔧', '피아노 조율용 황동 렌치');
-      setDialogue('딸 강하은 (14세)', '🪴', '화분 흙 속에서 [피아노 조율 렌치]를 찾았어요.');
-      
-      const hs = document.getElementById('hs-plant');
-      if (hs) hs.classList.add('solved');
-      const tag = document.getElementById('hs-plant-tag');
-      if (tag) tag.textContent = '✓ 비에 젖은 화분 (완료)';
-    }
-
-    function inspectGhostScore() {
-      if (gameState.ch2.gotScore) return;
-      playSFX('lens');
-      gameState.ch2.gotScore = true;
-      addItem('미완성 악보', '🎼', '하은이가 아빠와 함께 치려고 만든 악보 [도 - 미 - 솔 - 라]');
-      setDialogue('딸 강하은 (14세)', '🎼', '"아빠랑 둘이서 완성하고 싶었던 곡... 피아노로 [도 - 미 - 솔 - 라]를 연주해 줘요."');
-      
-      const hs = document.getElementById('hs-score');
-      if (hs) hs.classList.add('solved');
-      const tag = document.getElementById('hs-score-tag');
-      if (tag) tag.textContent = '✓ 찢겨진 악보 (완료)';
-    }
-
-    function openPianoPuzzle() {
-      if (gameState.ch2.pianoSolved) return;
-      openModal('modal-piano');
-    }
-
-    function playKey(noteName, freq) {
-      playTone(freq, 'sine', 0.5, 0.3);
-      gameState.ch2.pianoSequence.push(noteName);
-      document.getElementById('piano-input-display').textContent = '연주된 음계 : ' + gameState.ch2.pianoSequence.join(' → ');
-
-      if (gameState.ch2.pianoSequence.length === 4) {
-        const played = gameState.ch2.pianoSequence.join('-');
-        if (played === '도-미-솔-라') {
-          gameState.ch2.pianoSolved = true;
-          playSFX('unlock');
-          closeModal('modal-piano');
-
-          const hs = document.getElementById('hs-piano');
-          if (hs) hs.classList.add('solved');
-          const tag = document.getElementById('hs-piano-tag');
-          if (tag) tag.textContent = '✓ 업라이트 피아노 (완료)';
-
-          // Trigger emotional piano flashback
-          triggerFlashback('ch2', () => {
-            addItem('화해의 음표', '🎵', '부녀가 함께 완성한 따뜻한 피아노 멜로디');
-            setDialogue('딸 강하은 (14세)', '🎹', '"아빠, 사실 화내서 미안했어요..." - 피아노에서 빛이 뿜어져 나오며 온실 덩굴이 걷힙니다.');
-            document.getElementById('ch2-door-icon').textContent = '🌿🚪✨';
-          });
-        } else {
-          playSFX('error');
-          setTimeout(() => resetPianoInput(), 700);
-        }
-      }
-    }
-
-    function resetPianoInput() {
-      gameState.ch2.pianoSequence = [];
-      document.getElementById('piano-input-display').textContent = '연주된 음계 : [ 대기 중 ]';
-    }
-
-    function tryEscapeDoor2() {
-      if (gameState.ch2.pianoSolved) {
-        playSFX('unlock');
-        setDialogue('딸 강하은 (14세)', '🚪', '비가 그치고 무지개가 떠오르며 다음 기억의 문이 열립니다.');
-        setTimeout(() => enterChapter3(), 1200);
-      } else {
-        playSFX('error');
-        setDialogue('딸 강하은 (14세)', '🚪', '온실 문이 덩굴로 막혀있어요. 피아노 연주 [도-미-솔-라]를 완성해야 해요.');
-      }
-    }
-
-    // ================= CHAPTER 3 LOGIC =================
-    function enterChapter3() {
-      gameState.chapter = 3;
-      document.getElementById('layer-chapter-2').style.display = 'none';
-      document.getElementById('layer-chapter-3').style.display = 'block';
-      document.getElementById('hud-chapter-badge').textContent = 'CH 3';
-      document.getElementById('hud-chapter-title').textContent = '빛바랜 병실의 서재 (20세)';
-      updateDaughterVisual(3);
-      setDialogue('딸 강하은 (20세)', '🧥', '대학 졸업하고 독립하던 날의 방이에요... 아빠의 코트와 금고를 확인해 주세요.');
-    }
-
-    function inspectCoat() {
-      if (gameState.ch3.gotPrescription) return;
-      playSFX('click');
-      gameState.ch3.gotPrescription = true;
-      addItem('낡은 처방전', '📜', '아빠의 불치병 진단서와 딸의 졸업식 날짜 [1020]');
-      setDialogue('딸 강하은 (20세)', '📜', '코트 안주머니의 처방전... "아빠는 이때부터 혼자 아픔을 삼키고 계셨던 거였어요... 날짜는 [10월 20일]이에요."');
-      
-      const hs = document.getElementById('hs-coat');
-      if (hs) hs.classList.add('solved');
-      const tag = document.getElementById('hs-coat-tag');
-      if (tag) tag.textContent = '✓ 아빠의 오래된 코트 (완료)';
-    }
-
-    function inspectPhotoDesk() {
-      if (gameState.inventory.some(i => i.name === '졸업식 사진')) return;
-      playSFX('click');
-      addItem('졸업식 사진', '📷', '졸업식 날 딸 몰래 뒤에서 지켜보며 울던 아빠의 폴라로이드 사진');
-      setDialogue('딸 강하은 (20세)', '📷', '환하게 웃는 내 뒤에서 홀로 눈물을 닦는 아빠의 모습이 찍혀있어요...');
-      
-      const hs = document.getElementById('hs-photo');
-      if (hs) hs.classList.add('solved');
-      const tag = document.getElementById('hs-photo-tag');
-      if (tag) tag.textContent = '✓ 암실 현상대 (완료)';
     }
 
     function openSafePuzzle() {
