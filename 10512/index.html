@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER STRIKE: 3D 아레나 FPS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 3D 렌더링 캔버스 컨테이너 -->
+    <div id="game-container"></div>
+
+    <!-- 피격 / 회복 비넷 효과 -->
+    <div id="damage-vignette"></div>
+    <div id="heal-vignette"></div>
+
+    <!-- HUD 인터페이스 -->
+    <div id="hud">
+        <!-- 상단 헤더: 경기 시간, 점수 현황, 킬 피드 -->
+        <div id="top-bar">
+            <!-- 경기 정보 -->
+            <div class="hud-panel match-status">
+                <div class="status-item">
+                    <span class="status-label">MATCH TIME</span>
+                    <span id="match-timer" class="status-value">10:00</span>
+                </div>
+                <div class="status-divider"></div>
+                <div class="status-item">
+                    <span class="status-label">MY SCORE</span>
+                    <span id="player-score" class="status-value score-highlight">0</span>
+                </div>
+                <div class="status-divider"></div>
+                <div class="status-item">
+                    <span class="status-label">LEADER</span>
+                    <span id="leader-score" class="status-value">0 / 25 KILLS</span>
+                </div>
+            </div>
+
+            <!-- 킬 피드 (우상단) -->
+            <div id="kill-feed"></div>
+        </div>
+
+        <!-- 미니맵 레이더 (우상단 아래) -->
+        <div id="radar-container" class="hud-panel">
+            <canvas id="radar-canvas" width="160" height="160"></canvas>
+            <div class="radar-scanline"></div>
+            <div class="radar-label">RADAR SCANNER</div>
+        </div>
+
+        <!-- 킬 스트릭 / 아나운서 배너 (중앙 상단) -->
+        <div id="announcement-container">
+            <div id="announcement-title"></div>
+            <div id="announcement-subtitle"></div>
+        </div>
+
+        <!-- 크로스헤어 (화면 중앙) -->
+        <div id="crosshair-container">
+            <div class="crosshair-reticle" id="crosshair-reticle">
+                <div class="crosshair-line top"></div>
+                <div class="crosshair-line bottom"></div>
+                <div class="crosshair-line left"></div>
+                <div class="crosshair-line right"></div>
+                <div class="crosshair-dot"></div>
+            </div>
+            <!-- 히트마커 (타격 시 표시) -->
+            <div id="hitmarker">
+                <div class="hit-line tl"></div>
+                <div class="hit-line tr"></div>
+                <div class="hit-line bl"></div>
+                <div class="hit-line br"></div>
+            </div>
+            <div id="damage-indicator-text"></div>
+        </div>
+
+        <!-- 저격총 스코프 오버레이 -->
+        <div id="sniper-scope">
+            <div class="scope-overlay-bg"></div>
+            <div class="scope-lens">
+                <div class="scope-cross-h"></div>
+                <div class="scope-cross-v"></div>
+                <div class="scope-circle"></div>
+                <div class="scope-range-marks">
+                    <span>100M</span>
+                    <span>200M</span>
+                    <span>300M</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 정보창: 체력, 쉴드, 무기 및 탄약 -->
+        <div id="bottom-bar">
+            <!-- 좌하단: 플레이어 상태 (HP / Shield) -->
+            <div class="hud-panel player-vitality">
+                <div class="vital-row">
+                    <div class="vital-icon shield-icon">🛡️</div>
+                    <div class="vital-info">
+                        <div class="vital-text">
+                            <span>SHIELD</span>
+                            <span id="shield-val">100</span>
+                        </div>
+                        <div class="vital-bar-bg">
+                            <div id="shield-bar" class="vital-bar shield-bar" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="vital-row">
+                    <div class="vital-icon hp-icon">❤️</div>
+                    <div class="vital-info">
+                        <div class="vital-text">
+                            <span>HEALTH</span>
+                            <span id="hp-val">100</span>
+                        </div>
+                        <div class="vital-bar-bg">
+                            <div id="hp-bar" class="vital-bar hp-bar" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 중앙 하단: 무기 선택 휠 / 슬롯 -->
+            <div id="weapon-slots" class="hud-panel">
+                <div class="weapon-slot active" data-slot="0">
+                    <span class="slot-num">1</span>
+                    <span class="slot-name">ASSAULT RIFLE</span>
+                </div>
+                <div class="weapon-slot" data-slot="1">
+                    <span class="slot-num">2</span>
+                    <span class="slot-name">COMBAT SHOTGUN</span>
+                </div>
+                <div class="weapon-slot" data-slot="2">
+                    <span class="slot-num">3</span>
+                    <span class="slot-name">PLASMA SNIPER</span>
+                </div>
+                <div class="weapon-slot" data-slot="3">
+                    <span class="slot-num">4</span>
+                    <span class="slot-name">ROCKET LAUNCHER</span>
+                </div>
+            </div>
+
+            <!-- 우하단: 탄약 및 재장전 상태 -->
+            <div class="hud-panel weapon-ammo-display">
+                <div id="weapon-current-name">ASSAULT RIFLE</div>
+                <div class="ammo-numbers">
+                    <span id="ammo-clip">30</span>
+                    <span class="ammo-slash">/</span>
+                    <span id="ammo-reserve">180</span>
+                </div>
+                <div id="reload-indicator" class="reload-prompt">PRESS [R] TO RELOAD</div>
+                <div id="reload-progress-container">
+                    <div id="reload-progress-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 픽업 알림 / 인터랙션 프롬프트 -->
+        <div id="interaction-prompt"></div>
+    </div>
+
+    <!-- TAB 스코어보드 오버레이 -->
+    <div id="scoreboard-modal" class="modal-overlay hidden">
+        <div class="scoreboard-window hud-glass">
+            <div class="scoreboard-header">
+                <h2>CYBER DEATHMATCH LEADERBOARD</h2>
+                <div class="target-goal">TARGET: 25 KILLS TO WIN</div>
+            </div>
+            <table class="scoreboard-table">
+                <thead>
+                    <tr>
+                        <th>RANK</th>
+                        <th>OPERATIVE</th>
+                        <th>KILLS</th>
+                        <th>DEATHS</th>
+                        <th>K/D</th>
+                        <th>SCORE</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="scoreboard-body">
+                    <!-- JS에서 동적 주입 -->
+                </tbody>
+            </table>
+            <div class="scoreboard-footer">
+                <span>PRESS [TAB] TO CLOSE</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 시작 및 메인 메뉴 화면 -->
+    <div id="start-screen" class="overlay-screen">
+        <div class="menu-box hud-glass">
+            <div class="logo-area">
+                <h1 class="glitch-title" data-text="CYBER STRIKE">CYBER STRIKE</h1>
+                <div class="subtitle">3D CYBERPUNK DEATHMATCH ARENA</div>
+            </div>
+
+            <div class="menu-content">
+                <div class="game-instructions">
+                    <div class="instr-column">
+                        <h3>🕹️ 조작 방법</h3>
+                        <ul>
+                            <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> : 이동</li>
+                            <li><kbd>V</kbd> : <strong>시점 변경 (1인칭 ↔ 3인칭 ↔ 탑다운 고정)</strong></li>
+                            <li><kbd>마우스</kbd> : 시점 회전 & 조준</li>
+                            <li><kbd>좌클릭</kbd> : 발사 (사격)</li>
+                            <li><kbd>우클릭</kbd> : 조준 (스나이퍼 줌)</li>
+                            <li><kbd>SPACE</kbd> : 점프</li>
+                            <li><kbd>SHIFT</kbd> : 전력 질주 (Sprint)</li>
+                            <li><kbd>C</kbd> : 슬라이딩 / 앉기</li>
+                            <li><kbd>R</kbd> : 재장전</li>
+                            <li><kbd>1</kbd> ~ <kbd>4</kbd> / 휠 : 무기 변경</li>
+                            <li><kbd>TAB</kbd> : 실시간 점수판</li>
+                        </ul>
+                    </div>
+                    <div class="instr-column">
+                        <h3>⚡ 게임 규칙 & 팁</h3>
+                        <ul>
+                            <li>🎯 <strong>25킬</strong>을 먼저 달성하는 요원이 승리합니다.</li>
+                            <li>👁️ 어지러우시면 <kbd>V</kbd>키로 <strong>3인칭/탑다운 시점</strong>을 켜보세요!</li>
+                            <li>💥 맵 곳곳의 <strong>체력/쉴드 팩 & 탄약 상자</strong>를 선점하세요.</li>
+                            <li>🚀 <strong>점프 패드</strong>를 밟으면 공중으로 높이 솟구칩니다!</li>
+                            <li>🤖 지능적인 AI 봇들이 엄폐하고 사격하며 플레이어를 압박합니다.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 시점 & 멀미 방지 옵션 -->
+                <div class="settings-row">
+                    <div class="setting-item">
+                        <label for="view-mode-select">시점 모드:</label>
+                        <select id="view-mode-select">
+                            <option value="topdown" selected>총기 중심 견착 시점 (Gun-Aligned View ⭐)</option>
+                            <option value="third">3인칭 숄더뷰 (Over-The-Shoulder)</option>
+                            <option value="first">1인칭 FPS (First-Person)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="camera-shake-select">화면 흔들림(멀미 방지):</label>
+                        <select id="camera-shake-select">
+                            <option value="off" selected>흔들림 끄기 (편안함)</option>
+                            <option value="on">흔들림 켜기 (리얼 모드)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 봇 수 & 난이도 설정 -->
+                <div class="settings-row">
+                    <div class="setting-item">
+                        <label for="bot-diff-select">게임 난이도:</label>
+                        <select id="bot-diff-select">
+                            <option value="beginner" selected>초보자 이지 모드 (자동조준 + 자연회복 + 무한탄약 ⭐)</option>
+                            <option value="easy">루키 (Easy)</option>
+                            <option value="normal">베테랑 (Normal)</option>
+                            <option value="hard">사이버 엘리트 (Hard)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="bot-count-select">참여 봇 수:</label>
+                        <select id="bot-count-select">
+                            <option value="4" selected>4명 (입문용 추천)</option>
+                            <option value="6">6명 (기본 매치)</option>
+                            <option value="8">8명 (난타전)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="btn-start-game" class="cyber-button primary-btn">
+                        <span class="btn-glitch"></span>
+                        <span class="btn-text">DEPLOY TO ARENA (게임 시작)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임 일시정지 / 조준점 잠금 해제 화면 -->
+    <div id="pause-screen" class="overlay-screen hidden">
+        <div class="menu-box hud-glass pause-box">
+            <h2>SYSTEM PAUSED</h2>
+            <p>마우스 조준 잠금이 해제되었습니다.</p>
+            <div class="button-group">
+                <button id="btn-resume-game" class="cyber-button primary-btn">
+                    <span class="btn-text">RESUME BATTLE</span>
+                </button>
+                <button id="btn-restart-game" class="cyber-button secondary-btn">
+                    <span class="btn-text">RESTART MATCH</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임 오버 / 승리 결과 화면 -->
+    <div id="game-over-screen" class="overlay-screen hidden">
+        <div class="menu-box hud-glass result-box">
+            <h1 id="result-title" class="victory-text">VICTORY</h1>
+            <p id="result-subtitle">MISSION ACCOMPLISHED</p>
+            
+            <div class="result-stats">
+                <div class="stat-card">
+                    <div class="stat-num" id="res-kills">0</div>
+                    <div class="stat-label">TOTAL KILLS</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num" id="res-deaths">0</div>
+                    <div class="stat-label">DEATHS</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num" id="res-kd">0.0</div>
+                    <div class="stat-label">K/D RATIO</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num" id="res-accuracy">0%</div>
+                    <div class="stat-label">ACCURACY</div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button id="btn-play-again" class="cyber-button primary-btn">
+                    <span class="btn-text">PLAY AGAIN</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- 게임 번들 스크립트 (file:// 및 http:// 완벽 호환) -->
+    <script src="game.js"></script>
+</body>
+</html>
