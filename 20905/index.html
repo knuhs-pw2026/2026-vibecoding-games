@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>좀비 더스크: 픽셀 어드벤처 (Zombie Dusk Adventure)</title>
+  <meta name="description" content="포켓몬스터 DUSK와 좀비고등학교 감성의 탑다운 픽셀 어드벤처 좀비 게임! 7개 스테이지, 5종 좀비, 활 전투, 1칸 장애물 점프, 3페이즈 보스전을 경험하세요.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;600;800;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="gameContainer" class="game-container">
+    <!-- TOP HUD BAR -->
+    <header class="hud-top">
+      <div class="hud-left">
+        <div class="stage-info">
+          <span id="stageTitle" class="stage-title">STAGE 1: 플레이어의 집</span>
+          <span id="stageDesc" class="stage-desc">서둘러 밖으로 나가자!</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-icon">🎯</span>
+          <span id="objectiveText" class="objective-text">목표: 아래쪽 출구로 이동</span>
+        </div>
+      </div>
+
+      <div class="hud-center">
+        <div class="action-badges">
+          <span id="jumpBadge" class="badge disabled">SPACE: 장애물 필요</span>
+          <span id="bowBadge" class="badge ready">R: 활 발사 준비</span>
+        </div>
+      </div>
+
+      <div class="hud-right">
+        <div class="health-card">
+          <div class="hp-label-row">
+            <span class="hp-title">❤️ PLAYER HP</span>
+            <span id="hpText" class="hp-text">100 / 100 HP (10 칸)</span>
+          </div>
+          <div class="hp-bar-container">
+            <div id="hpBarFill" class="hp-bar-fill"></div>
+            <div class="hp-segments">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="minimap-wrapper">
+          <canvas id="minimapCanvas" width="90" height="90"></canvas>
+          <span class="minimap-label">RADAR</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN CANVAS VIEW -->
+    <div class="canvas-wrapper">
+      <canvas id="gameCanvas"></canvas>
+      <div class="crt-overlay"></div>
+    </div>
+
+    <!-- QUICK TOOLBAR -->
+    <footer class="hud-bottom">
+      <div class="controls-guide">
+        <span class="key-pill">방향키 / WASD</span> 이동
+        <span class="key-pill">R</span> 활 발사
+        <span class="key-pill">SPACE</span> 1칸 장애물 점프
+        <span class="key-pill">P</span> 일시정지
+      </div>
+
+      <div class="quick-actions">
+        <div class="stage-warp-group">
+          <label for="stageSelect">스테이지 이동:</label>
+          <select id="stageSelect" class="retro-select">
+            <option value="1">1. 플레이어의 집 (5x5)</option>
+            <option value="2">2. 마을 (200x200 / 50킬)</option>
+            <option value="3">3. 도시로 향하는 길 (뮤턴트 1)</option>
+            <option value="4">4. 대도시 (발전기 3개)</option>
+            <option value="5">5. 비밀 연구지역 (데이터칩 3개)</option>
+            <option value="6">6. 좀비 연구실 (격리밸브 3개)</option>
+            <option value="7">7. 최종 보스 챔버 (10x10 보스)</option>
+          </select>
+        </div>
+        <button id="btnSound" class="btn-retro-sm">🔊 사운드 ON</button>
+      </div>
+    </footer>
+
+    <!-- TOUCH CONTROLS (Mobile / Tablet) -->
+    <div id="touchControls" class="touch-controls">
+      <div class="dpad">
+        <button id="touchUp" class="touch-btn dpad-up">▲</button>
+        <div class="dpad-middle">
+          <button id="touchLeft" class="touch-btn dpad-left">◀</button>
+          <div class="dpad-center"></div>
+          <button id="touchRight" class="touch-btn dpad-right">▶</button>
+        </div>
+        <button id="touchDown" class="touch-btn dpad-down">▼</button>
+      </div>
+      <div class="action-buttons">
+        <button id="touchJump" class="touch-btn btn-jump">JUMP<br><small>Space</small></button>
+        <button id="touchShoot" class="touch-btn btn-shoot">BOW<br><small>R</small></button>
+      </div>
+    </div>
+
+    <!-- IN-GAME RADIO TRANSMISSION POPUP -->
+    <div id="radioTransmission" class="radio-box hidden">
+      <div class="radio-avatar">👨‍🔬</div>
+      <div class="radio-content">
+        <div class="radio-header">
+          <span class="radio-tag">📡 TACTICAL RADIO TRANSMISSION</span>
+          <span class="radio-sender">DR. IAN (닥터 이안)</span>
+        </div>
+        <p id="radioMessage" class="radio-text">"레온, 들리나? 자네 집 밖 마을에 좀비 떼가 몰려왔네. 활을 챙겨 탈출구를 열게!"</p>
+      </div>
+      <button id="btnDismissRadio" class="btn-radio-close">✕</button>
+    </div>
+
+    <!-- 1. STANDALONE TITLE SCREEN OVERLAY -->
+    <div id="titleScreen" class="overlay-screen">
+      <div class="title-panel">
+        <div class="title-badge-row">
+          <span class="badge-vibe">BIOHAZARD SURVIVAL 2049</span>
+          <span class="badge-vibe gold">2D PIXEL ADVENTURE</span>
+        </div>
+        
+        <h1 class="game-title">
+          <span class="title-main-glow">ZOMBIE DUSK</span>
+          <span class="title-sub">최후의 백신 : 더스트 아포칼립스</span>
+        </h1>
+        
+        <div class="hero-character-card">
+          <div class="hero-avatar-box">🏹</div>
+          <div class="hero-desc-box">
+            <strong class="hero-name">주인공: 생존 궁수 '레온 (Leon)'</strong>
+            <p class="hero-lore">무음의 특수 복합궁으로 무장한 전직 생체보안요원. 폐허가 된 메트로폴리스를 돌파하여 인류의 마지막 항체 백신을 탈환하라!</p>
+          </div>
+        </div>
+
+        <div class="title-feature-tags">
+          <span class="feat-pill">⚡ 7개 대형 오픈월드 맵</span>
+          <span class="feat-pill">🧟 5종 진화형 좀비 & 3페이즈 보스</span>
+          <span class="feat-pill">🦘 1칸 장애물 점프 & 활 저격</span>
+          <span class="feat-pill">💊 10 HP 전략적 회복 시스템</span>
+        </div>
+
+        <!-- Big Start Button positioned at the bottom -->
+        <button id="btnStart" class="btn-start-cinematic">
+          <span class="btn-icon">▶</span>
+          <span class="btn-text">GAME START (게임 시작)</span>
+          <span class="btn-subtext">세계관 브리핑 & 작전 개시</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. STORY & LORE PROLOGUE OVERLAY -->
+    <div id="storyScreen" class="overlay-screen hidden">
+      <div class="story-panel">
+        <div class="story-header">
+          <span class="story-chapter">PROLOGUE : CHAPTER 0</span>
+          <h2 class="story-title">멸망의 여명과 최후의 치료제</h2>
+        </div>
+
+        <div class="story-body">
+          <div class="story-scroll-box">
+            <div class="dialogue-block">
+              <div class="speaker-tag">📜 세계관 배경 리포트 (2049년 바이오 참사)</div>
+              <p class="story-p">
+                글로벌 거대 제약기업 <strong>'메트로 바이오-코프'</strong>의 지하 연구소에서 유전자 변형 군사 바이러스 <strong>'Z-Strain'</strong>이 유출되며, 전 세계 인구의 90%가 피에 굶주린 괴물로 변모했다.
+              </p>
+            </div>
+
+            <div class="dialogue-block radio">
+              <div class="speaker-tag radio">📡 [닥터 이안과의 긴급 무전 교신]</div>
+              <p class="story-p">
+                <em>"레온! 들리는가? 도시 지하 최심부 '오메가 챔버'에 유일한 항체 치료제인 <strong>[프로젝트: 아포칼립스 백신]</strong>이 보관되어 있네! 하지만 거대하게 변이된 <strong>10x10 바이러스 모체 보스</strong>가 격리 구역을 지키고 있어... 자네만이 이 지옥을 뚫고 백신을 회수할 수 있네!"</em>
+              </p>
+            </div>
+
+            <div class="mission-brief-box">
+              <div class="brief-title">🎯 레온의 작전 지침서 (OPERATION BRIEFING)</div>
+              <ul class="brief-list">
+                <li><strong>1. 1칸 장애물 점프 (SPACE)</strong>: 울타리, 상자, 바리케이드를 마주보고 뛰어넘어 포위를 회피하십시오.</li>
+                <li><strong>2. 정밀 활 저격 (R)</strong>: 화살로 적을 사냥하고, <strong>폭발 좀비</strong>를 원거리에서 맞춰 4타일 연쇄 폭발을 유도하십시오.</li>
+                <li><strong>3. 퀘스트 아이템 회수</strong>: 대도시의 <strong>비상 발전기 3개</strong>, 연구지역의 <strong>보안 칩 3개</strong>, 연구실의 <strong>격리 밸브 3개</strong>를 가동하여 다음 구역을 개방하십시오.</li>
+                <li><strong>4. 보스 처치 & 백신 획득</strong>: 3단계 페이즈의 최종 보스를 격파하고 인류의 희망인 백신을 손에 넣으십시오!</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="story-footer">
+          <button id="btnBackToTitle" class="btn-retro-secondary">◀ 메인 화면</button>
+          <button id="btnBeginAdventure" class="btn-start-action">🚀 작전 개시 (START ADVENTURE)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAUSE OVERLAY -->
+    <div id="pauseOverlay" class="overlay-screen hidden">
+      <div class="pause-panel">
+        <h2>GAME PAUSED</h2>
+        <p>P 키 또는 ESC 키를 눌러 재개하세요.</p>
+      </div>
+    </div>
+
+    <!-- GAME OVER OVERLAY -->
+    <div id="gameOverScreen" class="overlay-screen hidden">
+      <div class="gameover-panel">
+        <h1 class="gameover-title">GAME OVER</h1>
+        <p class="gameover-desc">플레이어의 체력이 모두 소진되었습니다...</p>
+        <div class="tip-box">
+          💡 <strong>생존 팁:</strong> 맵 곳곳에 놓인 <strong>빨간 회복약 포션(+10 HP)</strong>을 꾸준히 섭취하세요! 1칸 장애물은 <strong>Space</strong>로 뛰어넘어 좀비를 따돌리세요.
+        </div>
+        <button id="btnRestart" class="btn-retro-danger">🔄 작전 재도전</button>
+      </div>
+    </div>
+
+    <!-- VICTORY OVERLAY -->
+    <div id="victoryScreen" class="overlay-screen hidden">
+      <div class="victory-panel">
+        <div class="victory-trophy">💉✨</div>
+        <h1 class="victory-title">MISSION COMPLETE!</h1>
+        <p class="victory-desc">축하합니다! 거대 보스 좀비를 처치하고 인류의 희망인 <strong>항바이러스 백신</strong>을 회수했습니다!</p>
+        
+        <div class="stats-card">
+          <div class="stat-row">
+            <span>총 플레이 시간</span>
+            <strong id="statTime">0분 0초</strong>
+          </div>
+          <div class="stat-row">
+            <span>처치한 좀비 수</span>
+            <strong id="statKills">0 마리</strong>
+          </div>
+          <div class="stat-row">
+            <span>발사한 화살 수</span>
+            <strong id="statArrows">0 발</strong>
+          </div>
+        </div>
+
+        <button id="btnVictoryRestart" class="btn-retro-primary">🏆 다시 플레이하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
