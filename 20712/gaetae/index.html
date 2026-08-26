@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>네온 서바이벌 (Neon Survivors) - 2D 로그라이크 액션</title>
+  <meta name="description" content="사이버펑크 네온 테마의 2D 탑다운 액션 로그라이크 웹 게임. 다양한 무기 조합과 화려한 스킬로 끝없이 몰려오는 적들을 처치하고 생존하세요!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <!-- 게임 캔버스 -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- 게임 인트로 / 타이틀 화면 -->
+    <div id="start-screen" class="overlay-screen active">
+      <div class="title-box">
+        <div class="neon-badge">CYBERPUNK ROGUELIKE</div>
+        <h1 class="glow-title">NEON<br><span class="highlight">SURVIVORS</span></h1>
+        <p class="subtitle">네온 사이버 시티의 끝없는 기계 군단으로부터 생존하라</p>
+      </div>
+
+      <div class="instructions-card">
+        <h3>🎮 조작 방법</h3>
+        <div class="controls-grid">
+          <div class="control-item">
+            <span class="key-badge">W A S D</span> / <span class="key-badge">방향키</span>
+            <span class="control-desc">이동</span>
+          </div>
+          <div class="control-item">
+            <span class="key-badge">SPACE</span>
+            <span class="control-desc">대시 (무적 회피)</span>
+          </div>
+          <div class="control-item">
+            <span class="key-badge">AUTO</span>
+            <span class="control-desc">무기 자동 타겟팅 & 발사</span>
+          </div>
+          <div class="control-item">
+            <span class="key-badge">ESC / P</span>
+            <span class="control-desc">일시 정지</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="start-actions">
+        <button id="btn-start" class="neon-btn primary-btn">
+          <span class="btn-glow"></span>
+          <span class="btn-text">🚀 작전 시작 (START)</span>
+        </button>
+      </div>
+
+      <div class="best-score-bar">
+        <span>🏆 최고 시간: <strong id="title-best-time">00:00</strong></span>
+        <span>💥 최고 처치: <strong id="title-best-kills">0</strong></span>
+        <span>⭐ 최고 레벨: <strong id="title-best-level">LV.1</strong></span>
+      </div>
+    </div>
+
+    <!-- 인게임 HUD (상단/하단 오버레이) -->
+    <div id="hud" class="hidden">
+      <!-- 상단 XP 경험치 바 -->
+      <div class="xp-bar-container">
+        <div class="level-indicator">LV.<span id="hud-level">1</span></div>
+        <div class="xp-track">
+          <div id="hud-xp-fill" class="xp-fill" style="width: 0%;"></div>
+          <div class="xp-spark"></div>
+        </div>
+        <div class="xp-text"><span id="hud-xp-cur">0</span> / <span id="hud-xp-max">100</span> XP</div>
+      </div>
+
+      <!-- 상단 정보 헤더 (타이머, 처치 수, HP, 버튼) -->
+      <div class="hud-header">
+        <div class="hud-left">
+          <!-- HP 게이지 -->
+          <div class="hp-box">
+            <div class="hp-label">HP</div>
+            <div class="hp-bar-track">
+              <div id="hud-hp-fill" class="hp-bar-fill" style="width: 100%;"></div>
+              <div id="hud-shield-fill" class="shield-bar-fill" style="width: 0%;"></div>
+            </div>
+            <div class="hp-num"><span id="hud-hp-cur">100</span>/<span id="hud-hp-max">100</span></div>
+          </div>
+          <!-- 대시 쿨다운 게이지 -->
+          <div class="dash-box">
+            <div class="dash-label">DASH</div>
+            <div class="dash-track">
+              <div id="hud-dash-fill" class="dash-fill" style="width: 100%;"></div>
+            </div>
+            <div class="dash-hotkey">SPACE</div>
+          </div>
+        </div>
+
+        <div class="hud-center">
+          <div class="timer-display" id="hud-timer">00:00</div>
+          <div class="wave-tag" id="hud-wave-tag">웨이브 1</div>
+        </div>
+
+        <div class="hud-right">
+          <div class="stat-pill">
+            <span class="stat-icon">💀</span>
+            <span id="hud-kills">0</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-icon">🪙</span>
+            <span id="hud-gems">0</span>
+          </div>
+          <button id="btn-audio-toggle" class="icon-btn" title="음소거 토글">🔊</button>
+          <button id="btn-pause" class="icon-btn" title="일시정지">⏸</button>
+        </div>
+      </div>
+
+      <!-- 상단 거대 엘리트 보스 HP 바 -->
+      <div id="boss-hp-container" class="boss-hp-container hidden">
+        <div class="boss-name" id="boss-name-text">👑 [WAVE 10] 오메가 엘리트 커맨더</div>
+        <div class="boss-hp-track">
+          <div id="boss-hp-fill" class="boss-hp-fill" style="width: 100%;"></div>
+        </div>
+        <div class="boss-hp-text"><span id="boss-hp-cur">75,000</span> / <span id="boss-hp-max">75,000</span> HP</div>
+      </div>
+
+      <!-- 좌측 하단 활성 무기 & 패시브 아이콘 목록 -->
+      <div class="hud-weapons" id="hud-weapons-list">
+        <!-- JS로 동적 생성 -->
+      </div>
+
+      <!-- 활성 시너지 콤보 배지 목록 -->
+      <div class="hud-synergies" id="hud-synergies-list">
+        <!-- JS로 동적 생성 -->
+      </div>
+
+      <!-- 경고 배너 (엘리트/웨이브) -->
+      <div id="warning-banner" class="warning-banner hidden">
+        <div class="warning-text">⚠️ WARNING: 대규모 적 군단 접근 중! ⚠️</div>
+      </div>
+
+      <!-- 모바일 가상 조이스틱 영역 -->
+      <div id="touch-controls" class="touch-controls">
+        <div id="joystick-zone" class="joystick-zone">
+          <div id="joystick-base" class="joystick-base">
+            <div id="joystick-thumb" class="joystick-thumb"></div>
+          </div>
+        </div>
+        <button id="btn-touch-dash" class="touch-dash-btn">DASH</button>
+      </div>
+    </div>
+
+    <!-- 레벨업 선택 모달 -->
+    <div id="levelup-modal" class="overlay-modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content levelup-box">
+        <div class="levelup-header">
+          <div class="levelup-glow-sub">SYSTEM UPGRADE AVAILABLE</div>
+          <h2 class="levelup-title">⚡ 레벨업! 스킬을 선택하세요</h2>
+          <p class="levelup-desc">아래의 무기 또는 패시브 업그레이드 중 하나를 장착하십시오.</p>
+        </div>
+        
+        <div id="upgrade-cards" class="upgrade-cards-grid">
+          <!-- JS를 통해 카드 3개가 동적 생성됨 -->
+        </div>
+
+        <div class="reroll-container">
+          <button id="btn-reroll" class="reroll-btn" disabled>
+            🎲 새로고침 (<span id="reroll-count">0</span>회 남음)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 일시정지 모달 -->
+    <div id="pause-modal" class="overlay-modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content pause-box">
+        <h2>⏸ 일시 정지</h2>
+        <div class="pause-stats">
+          <p>생존 시간: <strong id="pause-time">00:00</strong></p>
+          <p>처치한 적: <strong id="pause-kills">0</strong></p>
+          <p>현재 레벨: <strong id="pause-level">1</strong></p>
+        </div>
+
+        <div class="settings-group">
+          <h3>⚙️ 사운드 & 비주얼 설정</h3>
+          <div class="setting-row">
+            <span>배경음악 (BGM)</span>
+            <input type="range" id="volume-bgm" min="0" max="100" value="50">
+          </div>
+          <div class="setting-row">
+            <span>효과음 (SFX)</span>
+            <input type="range" id="volume-sfx" min="0" max="100" value="70">
+          </div>
+          <div class="setting-row">
+            <span>화면 흔들림</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-screenshake" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-row">
+            <span>대미지 텍스트</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-damagetext" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-buttons">
+          <button id="btn-resume" class="neon-btn primary-btn">계속하기 (Resume)</button>
+          <button id="btn-restart-pause" class="neon-btn secondary-btn">처음부터 다시하기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 게임 오버 모달 -->
+    <div id="gameover-modal" class="overlay-modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content gameover-box">
+        <div class="gameover-skull">💀</div>
+        <h2 class="gameover-title">SYSTEM TERMINATED</h2>
+        <p class="gameover-sub">플레이어 코어가 파괴되었습니다.</p>
+
+        <div class="result-summary">
+          <div class="result-card">
+            <div class="result-label">생존 시간</div>
+            <div class="result-val highlight" id="result-time">00:00</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">처치한 적</div>
+            <div class="result-val" id="result-kills">0</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">도달 레벨</div>
+            <div class="result-val" id="result-level">1</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">총 가한 대미지</div>
+            <div class="result-val" id="result-damage">0</div>
+          </div>
+        </div>
+
+        <div id="new-record-banner" class="new-record-banner hidden">
+          🎉 NEW RECORD! 역대 최고 기록 경신!
+        </div>
+
+        <div class="alltime-best-box">
+          🏆 역대 최고: 시간 <strong id="result-best-time">00:00</strong> | 처치 <strong id="result-best-kills">0</strong> | 레벨 <strong id="result-best-level">LV.1</strong>
+        </div>
+
+        <div class="modal-buttons">
+          <button id="btn-restart" class="neon-btn primary-btn">🔄 다시 도전하기 (Replay)</button>
+          <button id="btn-title" class="neon-btn secondary-btn">🏠 타이틀 화면으로</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스크립트 로드 -->
+  <script src="js/audio.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/weapons.js"></script>
+  <script src="js/upgrades.js"></script>
+  <script src="js/enemies.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
