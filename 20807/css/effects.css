@@ -1,0 +1,302 @@
+/* effects.css - 불꽃놀이, 네온 효과, 전광판 모드 및 파티클 애니메이션 */
+
+/* 새로 등록된 카드 하이라이트 */
+.just-added-highlight {
+  animation: justAddedGlow 2s ease-out;
+}
+
+@keyframes justAddedGlow {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 35px #f43f5e, 0 0 15px #facc15;
+    border-color: #facc15;
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 45px #ec4899;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 리액션 플로팅 이모지 */
+.floating-emoji-particle {
+  position: fixed;
+  font-size: 1.5rem;
+  pointer-events: none;
+  z-index: 9999;
+  animation: floatEmojiUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes floatEmojiUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.8) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-40px) scale(1.4) rotate(15deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(1.1) rotate(-15deg);
+  }
+}
+
+/* 백업 저장 완료 펄스 */
+.saved-highlight {
+  animation: savedPulse 1.5s ease-in-out;
+}
+
+@keyframes savedPulse {
+  0% { transform: scale(1); background: rgba(16, 185, 129, 0.4); }
+  50% { transform: scale(1.08); background: rgba(16, 185, 129, 0.7); color: #fff; }
+  100% { transform: scale(1); }
+}
+
+/* ==================== 🎤 축제 무대 전광판 (Billboard Live Mode) ==================== */
+.billboard-modal-window {
+  max-width: 95vw;
+  width: 1200px;
+  height: 88vh;
+  background: radial-gradient(circle at 50% 30%, #1e1b4b 0%, #0c0a1f 60%, #000000 100%);
+  border: 2px solid rgba(168, 85, 247, 0.5);
+  box-shadow: 0 0 50px rgba(168, 85, 247, 0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+.billboard-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.billboard-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  letter-spacing: 1px;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+  animation: liveBlink 1.5s infinite;
+}
+
+@keyframes liveBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.billboard-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #facc15;
+  text-shadow: 0 0 15px rgba(250, 204, 21, 0.5);
+}
+
+/* 전광판 메인 슬라이드 디스플레이 */
+.billboard-main-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  position: relative;
+}
+
+.billboard-active-card {
+  width: 100%;
+  max-width: 800px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 28px;
+  padding: 40px 50px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(168, 85, 247, 0.2);
+  position: relative;
+  animation: billboardSlideEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes billboardSlideEnter {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.billboard-sticker {
+  position: absolute;
+  top: -24px;
+  right: 30px;
+  font-size: 4rem;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6));
+}
+
+.billboard-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.billboard-author {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.billboard-category {
+  background: rgba(168, 85, 247, 0.3);
+  color: #d8b4fe;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.billboard-content {
+  font-size: 2.1rem;
+  line-height: 1.5;
+  font-weight: 600;
+  color: #f8fafc;
+  margin-bottom: 30px;
+  word-break: break-word;
+}
+
+.billboard-bottom {
+  display: flex;
+  gap: 20px;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 18px;
+}
+
+.billboard-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.billboard-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.billboard-nav-btn.prev { left: 24px; }
+.billboard-nav-btn.next { right: 24px; }
+
+/* 하단 무한 롤링 티커 */
+.billboard-ticker-wrap {
+  background: #000;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 12px 0;
+}
+
+.billboard-ticker-move {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 25s linear infinite;
+  font-size: 1.1rem;
+  color: #fde047;
+  font-weight: 600;
+}
+
+@keyframes marquee {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-100%, 0); }
+}
+
+/* ==================== 드래그앤드롭 백업 드롭존 ==================== */
+.backup-dropzone {
+  border: 2px dashed rgba(168, 85, 247, 0.5);
+  background: rgba(168, 85, 247, 0.05);
+  border-radius: var(--radius-lg);
+  padding: 30px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 20px;
+}
+
+.backup-dropzone:hover, .backup-dropzone.drag-hover {
+  background: rgba(168, 85, 247, 0.15);
+  border-color: #a855f7;
+  transform: scale(1.01);
+}
+
+.dropzone-icon {
+  font-size: 2.8rem;
+  margin-bottom: 8px;
+}
+
+.backup-options-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.backup-options-row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.snapshots-container {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.snapshot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.snapshot-row:last-child {
+  border-bottom: none;
+}
+
+.badge-mini {
+  background: #a855f7;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  margin-right: 6px;
+}
+
+.snapshot-detail {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-left: 6px;
+}

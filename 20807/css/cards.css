@@ -1,0 +1,237 @@
+/* cards.css - 군성제 주간(낮) 파스텔 카드 & 스티커 스타일 */
+
+/* 기본 게스트 카드 레이아웃 */
+.guest-card {
+  position: relative;
+  background: #ffffff;
+  border: 2px solid rgba(2, 132, 199, 0.15);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.08), 0 2px 6px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.guest-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 32px rgba(2, 132, 199, 0.16);
+  border-color: rgba(2, 132, 199, 0.35);
+}
+
+/* 고정(Pinned) 카드 */
+.guest-card.is-pinned {
+  border: 2px solid #f59e0b !important;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2) !important;
+}
+
+.pinned-tag {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+/* 카드 내 3D 스티커 */
+.card-sticker {
+  position: absolute;
+  top: -12px;
+  right: 18px;
+  font-size: 2.2rem;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.12));
+  transform: rotate(8deg);
+  transition: transform 0.3s;
+  pointer-events: none;
+}
+
+.guest-card:hover .card-sticker {
+  transform: rotate(-10deg) scale(1.15);
+}
+
+/* 카드 헤더 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.card-author-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-avatar {
+  font-size: 1.4rem;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card-author {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* 관리자 액션 버튼 */
+.card-top-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-admin-action {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-admin-action:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+.btn-admin-action.pin {
+  background: #fef3c7;
+  border-color: #fde68a;
+  color: #b45309;
+}
+.btn-admin-action.pin:hover {
+  background: #f59e0b;
+  color: #fff;
+}
+
+/* 카드 본문 */
+.card-body {
+  margin-bottom: 16px;
+  flex: 1;
+}
+
+.card-text {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #1e293b;
+}
+
+/* ==================== 6가지 주간(낮) 파스텔 카드 테마 ==================== */
+.theme-sunny-lemon {
+  background: linear-gradient(135deg, #fefce8, #fef9c3);
+  border-color: #fef08a;
+}
+.theme-sunny-lemon .card-text {
+  color: #713f12;
+}
+
+.theme-sky-blue {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border-color: #bae6fd;
+}
+.theme-sky-blue .card-text {
+  color: #0c4a6e;
+}
+
+.theme-blossom-pink {
+  background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+  border-color: #fecdd3;
+}
+.theme-blossom-pink .card-text {
+  color: #881337;
+}
+
+.theme-fresh-mint {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border-color: #bbf7d0;
+}
+.theme-fresh-mint .card-text {
+  color: #14532d;
+}
+
+.theme-lavender-violet {
+  background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+  border-color: #e9d5ff;
+}
+.theme-lavender-violet .card-text {
+  color: #581c87;
+}
+
+.theme-pure-white {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+.theme-pure-white .card-text {
+  color: #0f172a;
+}
+
+/* ==================== 폰트 스타일 ==================== */
+.font-sans .card-text {
+  font-family: var(--font-main);
+  font-weight: 600;
+}
+
+.font-pen .card-text {
+  font-family: var(--font-pen);
+  font-size: 1.35rem;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.font-cute .card-text {
+  font-family: var(--font-cute);
+  font-size: 1.15rem;
+  letter-spacing: -0.3px;
+}
+
+/* ==================== 카드 푸터 ==================== */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.card-time-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.btn-footer-save {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+  color: #0284c7;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+.btn-footer-save:hover {
+  background: #0284c7;
+  color: #fff;
+  border-color: #0284c7;
+}

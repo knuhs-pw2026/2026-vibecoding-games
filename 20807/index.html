@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>군성제 ☀️ | 2026 군성제 실시간 라이브 전광판</title>
+  <meta name="description" content="2026 군성제 실시간 라이브 전광판 & 익명 방명록 - 친구, 선후배, 밴드부에게 남기는 설레는 이야기! 관리자 삭제 및 실시간 JSON 자동 백업 지원">
+  <meta name="keywords" content="군성제, 학교축제, 전광판, 축제방명록, 익명롤링페이퍼, 대동제, 익명게시판">
+
+  <!-- 스타일시트 로드 -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/effects.css">
+</head>
+<body>
+
+  <!-- 청량한 햇살 & 비눗방울 배경 레이어 -->
+  <canvas id="festivalCanvas"></canvas>
+
+  <!-- 앱 메인 컨테이너 -->
+  <div class="app-container">
+
+    <!-- 상단 헤더 네비게이션 -->
+    <header class="fest-header">
+      <div class="brand-wrap">
+        <span class="brand-icon">☀️</span>
+        <div class="brand-title-wrap">
+          <h1>군성제 ☀️</h1>
+          <span class="brand-sub">2026 군성제 실시간 라이브 전광판</span>
+        </div>
+      </div>
+
+      <div class="header-right-actions">
+        <!-- 백업 상태 알림 뱃지 -->
+        <div class="backup-status-badge" id="headerBackupBadge" onclick="App.openBackupModal()" title="클릭하여 백업 센터 열기">
+          <span class="pulse-dot"></span> JSON 자동 백업 활성
+        </div>
+
+        <!-- 원클릭 JSON 다운로드 버튼 -->
+        <button class="btn btn-outline btn-sm" onclick="StorageManager.exportJSON()" title="현재 방명록 전체 JSON 파일 백업 다운로드">
+          💾 JSON 백업
+        </button>
+
+        <!-- 백업 센터 버튼 -->
+        <button class="btn btn-outline btn-sm" onclick="App.openBackupModal()" title="데이터 내보내기 및 복구">
+          🛡️ 백업 센터
+        </button>
+
+        <!-- 전체화면 토글 버튼 -->
+        <button class="btn btn-outline btn-sm" onclick="App.toggleFullscreen()" title="무대 스크린/빔프로젝터용 전체화면">
+          ⛶ 전체화면
+        </button>
+
+        <!-- 관리자 로그인 버튼 -->
+        <button class="btn btn-admin btn-sm" id="adminToggleBtn" onclick="AdminManager.isLoggedIn ? AdminManager.openDashboard() : AdminManager.showLoginModal()">
+          <span>🔒 관리자 로그인</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ==================== 🎤 1. 메인 무대 라이브 전광판 섹션 ==================== -->
+    <section class="main-billboard-section">
+      <!-- 전광판 상단 제어 바 -->
+      <div class="billboard-stage-header">
+        <div class="stage-badge-wrap">
+          <span class="live-stage-badge">🔴 LIVE STAGE</span>
+          <span class="stage-title">2026 군성제 실시간 전광판</span>
+        </div>
+
+        <div class="stage-controls">
+          <button class="stage-ctrl-btn" onclick="App.prevBillboardSlide()" title="이전 메시지">◀ 이전</button>
+          <button class="stage-ctrl-btn" id="playPauseBtn" onclick="App.togglePlayPause()" title="자동 슬라이드 일시정지/재생">⏸️ 일시정지</button>
+          <button class="stage-ctrl-btn" onclick="App.nextBillboardSlide()" title="다음 메시지">다음 ▶</button>
+        </div>
+      </div>
+
+      <!-- 전광판 메인 카드 디스플레이 -->
+      <div class="billboard-stage-viewport">
+        <div id="mainBillboardCard" class="main-billboard-card-wrap">
+          <!-- JS 동적 렌더링 -->
+        </div>
+      </div>
+
+      <!-- 하단 실시간 롤링 전광판 티커 -->
+      <div class="billboard-ticker-wrap">
+        <div class="billboard-ticker-move" id="mainBillboardTicker">
+          군성제 익명 방명록에 남겨진 메시지들이 실시간으로 전광판을 통해 무대에 송출됩니다 ✨
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ✍️ 2. 전광판 바로 아래 심플 퀵 입력 바 ==================== -->
+    <section class="quick-input-section">
+      <form class="quick-input-form" onsubmit="App.handleQuickSubmit(event)">
+        
+        <div class="quick-input-row">
+          <!-- 닉네임 입력 및 랜덤 주사위 -->
+          <div class="quick-nick-wrap">
+            <span class="quick-icon">🎭</span>
+            <input type="text" id="quickNickname" class="quick-nick-input" placeholder="닉네임" maxlength="20" required>
+            <button type="button" class="btn-dice-mini" onclick="App.generateRandomNickname()" title="새로운 닉네임 랜덤 생성">🎲</button>
+          </div>
+
+          <!-- 할 말(메시지) 입력창 -->
+          <div class="quick-msg-wrap">
+            <span class="quick-icon">💬</span>
+            <input type="text" id="quickContent" class="quick-msg-input" placeholder="군성제 전광판에 띄울 메시지를 입력하세요... (Enter 또는 등록)" maxlength="150" oninput="App.handleQuickInput(this.value)" required>
+            <span class="quick-char-count" id="quickCharCount">0/150</span>
+          </div>
+
+          <!-- 전광판 띄우기 버튼 -->
+          <button type="submit" class="btn-quick-submit">
+            <span>✨ 전광판 띄우기</span>
+          </button>
+        </div>
+
+        <div class="quick-sub-row">
+          <span class="quick-hint-text">💡 부적절하거나 심한 말은 관리자가 실시간으로 확인하여 삭제 조치합니다.</span>
+          <div class="quick-backup-info">
+            <span>💾 메시지 등록 시 JSON 자동 백업</span>
+          </div>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- ==================== 📊 3. 통계 & 피드 검색/정렬 섹션 ==================== -->
+    <section class="toolbar-section">
+      <div class="toolbar-top">
+        <!-- 군성제 통계 -->
+        <div class="fest-stats-mini">
+          <span>💌 군성제 방명록 총 <strong id="statTotalMessages">0</strong>건</span>
+        </div>
+
+        <!-- 검색 & 정렬 -->
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="닉네임 / 내용 검색..." class="search-input" oninput="App.handleSearch(this.value)">
+          </div>
+
+          <div class="sort-group">
+            <button class="sort-btn active" data-sort="latest" onclick="App.setSort('latest')">🕒 최신순</button>
+            <button class="sort-btn" data-sort="popular" onclick="App.setSort('popular')">🔥 인기순</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 실시간 방명록 피드 그리드 -->
+    <main class="guestbook-feed" id="guestbookFeed">
+      <!-- JS 동적 렌더링 -->
+    </main>
+
+  </div> <!-- /app-container -->
+
+  <!-- ==================== 관리자 로그인 모달 ==================== -->
+  <div class="modal-backdrop" id="adminLoginModal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3><span>🔒</span> 관리자 모드 로그인</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('adminLoginModal').classList.remove('active')">&times;</button>
+      </div>
+
+      <form id="adminLoginForm">
+        <div class="modal-body">
+          <p class="text-muted mb-3" style="font-size: 0.9rem;">
+            관리자로 로그인하면 전광판과 피드에서 부적절하거나 심한 말을 <strong>즉시 삭제</strong>할 수 있습니다.
+          </p>
+          <div class="form-group">
+            <label class="form-label" for="adminPasswordInput">관리자 비밀번호</label>
+            <input type="password" id="adminPasswordInput" class="form-input" placeholder="비밀번호 입력 (기본: 123456)" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="document.getElementById('adminLoginModal').classList.remove('active')">취소</button>
+          <button type="submit" class="btn btn-primary">👑 관리자 로그인</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== 관리자 대시보드 모달 ==================== -->
+  <div class="modal-backdrop" id="adminDashboardModal">
+    <div class="modal-window modal-window-lg">
+      <div class="modal-header">
+        <h3><span>👑</span> 군성제 전광판 & 방명록 관리자 대시보드</h3>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-sm btn-outline-danger" onclick="AdminManager.logout(); document.getElementById('adminDashboardModal').classList.remove('active');">
+            로그아웃
+          </button>
+          <button class="modal-close-btn" onclick="document.getElementById('adminDashboardModal').classList.remove('active')">&times;</button>
+        </div>
+      </div>
+
+      <div class="admin-tabs-nav">
+        <button class="admin-tab-btn active" data-tab="messages" onclick="AdminManager.renderDashboardTab('messages')">
+          📋 전체 글 관리
+        </button>
+        <button class="admin-tab-btn" data-tab="backups" onclick="AdminManager.renderDashboardTab('backups')">
+          🛡️ 백업 & 롤백
+        </button>
+      </div>
+
+      <div class="modal-body" id="adminTabContent">
+        <!-- JS 동적 탭 렌더링 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 3중 백업 및 복구 센터 모달 ==================== -->
+  <div class="modal-backdrop" id="backupModal">
+    <div class="modal-window modal-window-lg">
+      <div class="modal-header">
+        <h3><span>🛡️</span> 군성제 방명록 3중 백업 및 복구 센터</h3>
+        <button class="modal-close-btn" onclick="App.closeBackupModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="text-muted mb-3" style="font-size: 0.9rem;">
+          사용자가 방명록을 입력할 때마다 <strong>JSON 데이터가 자동으로 백업 동기화</strong>되며, 언제든 파일 다운로드 및 복원이 가능합니다.
+        </p>
+
+        <!-- 1. 원클릭 백업 다운로드 -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px;">
+          <div style="background: rgba(2, 132, 199, 0.08); border: 1px solid rgba(2, 132, 199, 0.25); border-radius: var(--radius-md); padding: 18px; text-align: center;">
+            <div style="font-size: 1.8rem; margin-bottom: 6px;">💾</div>
+            <h4 style="margin-bottom: 4px; color: #0284c7;">JSON 전체 백업</h4>
+            <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 12px;">모든 방명록 내용 포함 백업 파일</p>
+            <button class="btn btn-primary btn-sm" onclick="StorageManager.exportJSON()">JSON 다운로드</button>
+          </div>
+
+          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-md); padding: 18px; text-align: center;">
+            <div style="font-size: 1.8rem; margin-bottom: 6px;">📊</div>
+            <h4 style="margin-bottom: 4px; color: #059669;">엑셀/CSV 내보내기</h4>
+            <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 12px;">엑셀 프로그램에서 열람 가능한 표 형식 목록</p>
+            <button class="btn btn-outline btn-sm" onclick="StorageManager.exportCSV()">CSV 다운로드</button>
+          </div>
+        </div>
+
+        <!-- 2. 백업 파일 업로드 / 복원 드롭존 -->
+        <h4 class="mb-2">📥 백업 파일 불러오기 (복구)</h4>
+        <div class="backup-dropzone" id="backupDropzone">
+          <div class="dropzone-icon">📂</div>
+          <h4>이곳에 백업(.json) 파일을 드래그하거나 클릭하세요</h4>
+          <p class="text-muted" style="font-size: 0.85rem;">이전에 다운로드해둔 군성제 방명록 백업 파일을 선택하여 즉시 복원합니다.</p>
+          <input type="file" id="backupFileInput" accept=".json" style="display: none;">
+        </div>
+
+        <div class="backup-options-row">
+          <label>
+            <input type="radio" name="importMode" value="replace" checked>
+            <span>전체 덮어쓰기 (백업 파일 시점으로 완전 복원)</span>
+          </label>
+          <label>
+            <input type="radio" name="importMode" value="merge">
+            <span>기존 데이터와 병합 (누락된 글만 추가)</span>
+          </label>
+        </div>
+
+        <!-- 3. 자동 복구 스냅샷 타임라인 -->
+        <h4 class="mt-4 mb-2">🕒 최근 자동 복원 지점 (스냅샷)</h4>
+        <div class="snapshots-container" id="backupSnapshotsList">
+          <!-- JS 동적 렌더링 -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="App.closeBackupModal()">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 토스트 알림 컨테이너 -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- JS 스크립트 로드 순서 -->
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/fireworks.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
