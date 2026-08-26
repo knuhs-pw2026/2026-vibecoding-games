@@ -1,0 +1,1164 @@
+/* ===================================================
+   네온 서바이벌 (NEON SURVIVORS) - CYBERPUNK STYLESHEET
+   =================================================== */
+
+:root {
+  --bg-dark: #070913;
+  --bg-panel: rgba(13, 17, 34, 0.85);
+  --bg-card: rgba(22, 28, 54, 0.75);
+  --border-neon-blue: #00f0ff;
+  --border-neon-purple: #b026ff;
+  --border-neon-pink: #ff0077;
+  --border-neon-green: #00ff66;
+  --border-neon-yellow: #ffcc00;
+  --text-primary: #f0f6fc;
+  --text-secondary: #8b949e;
+  --text-muted: #586069;
+  --font-display: 'Orbitron', -apple-system, sans-serif;
+  --font-ui: 'Rajdhani', 'Noto Sans KR', sans-serif;
+  --glow-cyan: 0 0 15px rgba(0, 240, 255, 0.6), 0 0 30px rgba(0, 240, 255, 0.2);
+  --glow-magenta: 0 0 15px rgba(255, 0, 119, 0.6), 0 0 30px rgba(255, 0, 119, 0.2);
+  --glow-purple: 0 0 15px rgba(176, 38, 255, 0.6), 0 0 30px rgba(176, 38, 255, 0.2);
+  --glow-yellow: 0 0 15px rgba(255, 204, 0, 0.6), 0 0 30px rgba(255, 204, 0, 0.2);
+  --glass-backdrop: blur(12px) saturate(160%);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  font-family: var(--font-ui);
+  color: var(--text-primary);
+}
+
+#game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at 50% 50%, #11162e 0%, #060813 100%);
+}
+
+canvas#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ===================================================
+   오버레이 스크린 (시작 화면, 모달)
+   =================================================== */
+.overlay-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(6, 8, 19, 0.88);
+  backdrop-filter: var(--glass-backdrop);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.overlay-screen.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.title-box {
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: floatTitle 4s ease-in-out infinite;
+}
+
+@keyframes floatTitle {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.neon-badge {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 4px;
+  color: var(--border-neon-blue);
+  background: rgba(0, 240, 255, 0.1);
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+  margin-bottom: 0.8rem;
+  text-transform: uppercase;
+}
+
+.glow-title {
+  font-family: var(--font-display);
+  font-size: 3.8rem;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: 3px;
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(0, 240, 255, 0.7), 0 0 40px rgba(0, 240, 255, 0.3);
+}
+
+.glow-title .highlight {
+  color: var(--border-neon-pink);
+  text-shadow: 0 0 20px rgba(255, 0, 119, 0.8), 0 0 40px rgba(255, 0, 119, 0.4);
+}
+
+.subtitle {
+  margin-top: 0.8rem;
+  font-size: 1.15rem;
+  color: #a5b4fc;
+  letter-spacing: 1px;
+}
+
+.instructions-card {
+  background: var(--bg-panel);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 240, 255, 0.05);
+  margin-bottom: 2rem;
+}
+
+.instructions-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--border-neon-blue);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.controls-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.control-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0.6rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+.key-badge {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid var(--border-neon-blue);
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  box-shadow: 0 0 6px rgba(0, 240, 255, 0.3);
+}
+
+.control-desc {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.start-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.neon-btn {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  padding: 1rem 2.5rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #00f0ff 0%, #0077ff 100%);
+  color: #030816;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+.primary-btn:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 0 35px rgba(0, 240, 255, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.6);
+}
+
+.primary-btn:active {
+  transform: scale(0.98);
+}
+
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.best-score-bar {
+  display: flex;
+  gap: 2rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.best-score-bar strong {
+  color: var(--border-neon-yellow);
+  font-family: var(--font-display);
+}
+
+/* ===================================================
+   인게임 HUD (상단 바, HP, 통계)
+   =================================================== */
+#hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+}
+
+#hud.hidden {
+  display: none !important;
+}
+
+/* 상단 XP 바 */
+.xp-bar-container {
+  width: 100%;
+  height: 24px;
+  background: rgba(5, 7, 18, 0.9);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  gap: 0.8rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.level-indicator {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: var(--border-neon-blue);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
+  white-space: nowrap;
+}
+
+.xp-track {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00f0ff, #b026ff);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+  transition: width 0.2s ease-out;
+}
+
+.xp-text {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* HUD 상단 헤더 */
+.hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.8rem 1.5rem;
+}
+
+.hud-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: auto;
+}
+
+.hp-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(10, 14, 28, 0.8);
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 0, 119, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.hp-label {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--border-neon-pink);
+}
+
+.hp-bar-track {
+  position: relative;
+  width: 160px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.hp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff0077, #ff5500);
+  box-shadow: 0 0 8px rgba(255, 0, 119, 0.8);
+  transition: width 0.15s ease-out;
+}
+
+.shield-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(0, 240, 255, 0.6);
+  transition: width 0.15s ease-out;
+}
+
+.hp-num {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: #ffffff;
+}
+
+.dash-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(10, 14, 28, 0.8);
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  backdrop-filter: blur(8px);
+  width: fit-content;
+}
+
+.dash-label {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--border-neon-blue);
+}
+
+.dash-track {
+  width: 90px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.dash-fill {
+  height: 100%;
+  background: var(--border-neon-blue);
+  box-shadow: 0 0 6px var(--border-neon-blue);
+  transition: width 0.05s linear;
+}
+
+.dash-hotkey {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+}
+
+.hud-center {
+  text-align: center;
+}
+
+.timer-display {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.wave-tag {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: var(--border-neon-yellow);
+  background: rgba(255, 204, 0, 0.15);
+  border: 1px solid rgba(255, 204, 0, 0.4);
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.hud-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  pointer-events: auto;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(10, 14, 28, 0.8);
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.icon-btn {
+  background: rgba(10, 14, 28, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+  backdrop-filter: blur(8px);
+}
+
+.icon-btn:hover {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: var(--border-neon-blue);
+  transform: scale(1.08);
+}
+
+/* 좌측 하단 무기 슬롯 */
+.hud-weapons {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  display: flex;
+  gap: 0.6rem;
+  pointer-events: auto;
+}
+
+.weapon-slot-badge {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  background: rgba(12, 17, 35, 0.85);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.4rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s;
+}
+
+.weapon-slot-badge:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-neon-blue);
+}
+
+.weapon-level-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: var(--border-neon-blue);
+  color: #040817;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 900;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 👑 상단 거대 엘리트 보스 HP 게이지 */
+.boss-hp-container {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 650px;
+  background: rgba(10, 5, 20, 0.85);
+  border: 2px solid #ff0055;
+  border-radius: 12px;
+  padding: 8px 16px;
+  box-shadow: 0 0 25px rgba(255, 0, 85, 0.6), inset 0 0 15px rgba(255, 0, 85, 0.2);
+  z-index: 50;
+  animation: bossBarPulse 2s infinite alternate;
+}
+
+@keyframes bossBarPulse {
+  0% { box-shadow: 0 0 15px rgba(255, 0, 85, 0.5); }
+  100% { box-shadow: 0 0 30px rgba(255, 0, 85, 0.9), 0 0 15px rgba(255, 215, 0, 0.6); }
+}
+
+.boss-name {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+  margin-bottom: 5px;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.boss-hp-track {
+  width: 100%;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 0, 85, 0.5);
+}
+
+.boss-hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff0055, #ff5500, #ffd700);
+  box-shadow: 0 0 12px #ff0055;
+  transition: width 0.15s ease-out;
+}
+
+.boss-hp-text {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: right;
+  margin-top: 3px;
+}
+
+/* 💥 활성 시너지 콤보 배지 목록 */
+.hud-synergies {
+  position: absolute;
+  bottom: 85px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: auto;
+  z-index: 40;
+}
+
+.synergy-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(20, 10, 40, 0.9), rgba(40, 15, 60, 0.85));
+  border: 1px solid #ffd700;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  animation: synergyGlow 2s infinite alternate;
+}
+
+@keyframes synergyGlow {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.02); box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
+}
+
+/* 경고 배너 */
+.warning-banner {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, rgba(255, 0, 119, 0) 0%, rgba(255, 0, 119, 0.85) 50%, rgba(255, 0, 119, 0) 100%);
+  padding: 0.8rem 3rem;
+  border-top: 2px solid var(--border-neon-pink);
+  border-bottom: 2px solid var(--border-neon-pink);
+  animation: bannerPulse 0.8s ease-in-out infinite alternate;
+  z-index: 60;
+}
+
+@keyframes bannerPulse {
+  0% { transform: translateX(-50%) scale(0.98); opacity: 0.8; }
+  100% { transform: translateX(-50%) scale(1.03); opacity: 1; filter: drop-shadow(0 0 15px #ff0077); }
+}
+
+.warning-text {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #ffffff;
+  text-shadow: 0 0 10px #ff0077;
+}
+
+/* ===================================================
+   모달 공통 스타일 (레벨업, 일시정지, 게임오버)
+   =================================================== */
+.overlay-modal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 120;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.overlay-modal.hidden {
+  display: none !important;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 5, 14, 0.8);
+  backdrop-filter: var(--glass-backdrop);
+}
+
+.modal-content {
+  position: relative;
+  background: var(--bg-panel);
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  z-index: 10;
+  max-width: 90%;
+  animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* 레벨업 모달 */
+.levelup-box {
+  width: 820px;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 40px rgba(0, 240, 255, 0.2);
+  text-align: center;
+}
+
+.levelup-header {
+  margin-bottom: 1.8rem;
+}
+
+.levelup-glow-sub {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 3px;
+  color: var(--border-neon-yellow);
+  text-transform: uppercase;
+}
+
+.levelup-title {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 0 15px rgba(0, 240, 255, 0.7);
+  margin-top: 0.3rem;
+}
+
+.levelup-desc {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-top: 0.3rem;
+}
+
+.upgrade-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.upgrade-card {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 1.6rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+  overflow: hidden;
+}
+
+.upgrade-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, var(--card-glow, rgba(0, 240, 255, 0.2)), transparent 70%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.upgrade-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  border-color: var(--card-border, var(--border-neon-blue));
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 25px var(--card-glow, rgba(0, 240, 255, 0.4));
+}
+
+.upgrade-card.type-weapon {
+  --card-border: var(--border-neon-blue);
+  --card-glow: rgba(0, 240, 255, 0.4);
+}
+
+.upgrade-card.type-passive {
+  --card-border: var(--border-neon-purple);
+  --card-glow: rgba(176, 38, 255, 0.4);
+}
+
+/* 👑 6레벨 초월 승급 전용 황금/무지개 카드 스타일 */
+.upgrade-card.type-evolved {
+  --card-border: #ffd700;
+  --card-glow: rgba(255, 215, 0, 0.6);
+  background: linear-gradient(145deg, rgba(35, 28, 5, 0.9), rgba(50, 10, 50, 0.85));
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(255, 215, 0, 0.15);
+  animation: evolvedCardPulse 2s infinite alternate ease-in-out;
+}
+
+@keyframes evolvedCardPulse {
+  0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+  100% { transform: scale(1.02); box-shadow: 0 0 35px rgba(255, 215, 0, 0.8), 0 0 15px rgba(255, 0, 128, 0.5); }
+}
+
+.type-evolved .upgrade-type-tag {
+  color: #ffd700;
+  border: 1px solid #ffd700;
+  background: rgba(255, 215, 0, 0.2);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.evolved-label {
+  color: #ff3366 !important;
+  font-weight: 900 !important;
+  text-shadow: 0 0 10px rgba(255, 51, 102, 0.8);
+  animation: labelFlicker 1.2s infinite alternate;
+}
+
+@keyframes labelFlicker {
+  0% { opacity: 0.8; }
+  100% { opacity: 1; filter: drop-shadow(0 0 8px #ffd700); }
+}
+
+/* 초월 승급된 무기 HUD 슬롯 */
+.weapon-slot-badge.evolved-slot {
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+  background: rgba(30, 20, 50, 0.9);
+}
+
+.weapon-level-badge.evolved-badge {
+  background: linear-gradient(135deg, #ffd700, #ff0077);
+  color: #000000;
+  font-size: 0.55rem;
+  font-weight: 900;
+  border: 1px solid #ffffff;
+}
+
+.upgrade-type-tag {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  margin-bottom: 0.8rem;
+  letter-spacing: 1px;
+}
+
+.type-weapon .upgrade-type-tag {
+  color: var(--border-neon-blue);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+}
+
+.type-passive .upgrade-type-tag {
+  color: var(--border-neon-purple);
+  border: 1px solid rgba(176, 38, 255, 0.4);
+}
+
+.upgrade-icon {
+  font-size: 2.8rem;
+  margin-bottom: 0.8rem;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+}
+
+.upgrade-name {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 0.4rem;
+}
+
+.upgrade-level-label {
+  font-size: 0.8rem;
+  color: var(--border-neon-yellow);
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+
+.upgrade-desc {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+.reroll-container {
+  display: flex;
+  justify-content: center;
+}
+
+.reroll-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-secondary);
+  padding: 8px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.reroll-btn:not(:disabled):hover {
+  background: rgba(255, 204, 0, 0.15);
+  border-color: var(--border-neon-yellow);
+  color: var(--border-neon-yellow);
+}
+
+.reroll-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 일시정지 모달 */
+.pause-box {
+  width: 440px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pause-box h2 {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.pause-stats {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-around;
+}
+
+.pause-stats p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.pause-stats strong {
+  color: #ffffff;
+  font-family: var(--font-display);
+}
+
+.settings-group {
+  margin-bottom: 1.8rem;
+}
+
+.settings-group h3 {
+  font-size: 1rem;
+  color: var(--border-neon-blue);
+  margin-bottom: 0.8rem;
+  font-family: var(--font-display);
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+  font-size: 0.95rem;
+  color: #cbd5e1;
+}
+
+.setting-row input[type="range"] {
+  accent-color: var(--border-neon-blue);
+  cursor: pointer;
+}
+
+/* 스위치 토글 */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  transition: 0.3s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+input:checked + .slider {
+  background-color: var(--border-neon-blue);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* 게임 오버 모달 */
+.gameover-box {
+  width: 500px;
+  text-align: center;
+  border: 1px solid rgba(255, 0, 119, 0.5);
+  box-shadow: 0 0 50px rgba(255, 0, 119, 0.3);
+}
+
+.gameover-skull {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+  animation: pulseSkull 1.5s infinite;
+}
+
+@keyframes pulseSkull {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); filter: drop-shadow(0 0 15px #ff0077); }
+}
+
+.gameover-title {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--border-neon-pink);
+  text-shadow: 0 0 20px rgba(255, 0, 119, 0.8);
+  letter-spacing: 2px;
+}
+
+.gameover-sub {
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.result-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.result-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.9rem;
+}
+
+.result-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.2rem;
+}
+
+.result-val {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.result-val.highlight {
+  color: var(--border-neon-yellow);
+}
+
+.new-record-banner {
+  background: linear-gradient(90deg, rgba(255, 204, 0, 0.1), rgba(255, 204, 0, 0.3), rgba(255, 204, 0, 0.1));
+  border: 1px solid var(--border-neon-yellow);
+  color: var(--border-neon-yellow);
+  font-family: var(--font-display);
+  font-weight: 800;
+  padding: 0.6rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  animation: glowYellow 1s infinite alternate;
+}
+
+.alltime-best-box {
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px dashed rgba(0, 240, 255, 0.35);
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  color: #cbd5e1;
+  margin-bottom: 1.5rem;
+}
+
+.alltime-best-box strong {
+  color: var(--border-neon-blue);
+  font-family: var(--font-display);
+}
+
+@keyframes glowYellow {
+  0% { box-shadow: 0 0 5px rgba(255, 204, 0, 0.3); }
+  100% { box-shadow: 0 0 15px rgba(255, 204, 0, 0.7); }
+}
+
+/* 터치 컨트롤 (모바일 지원) */
+.touch-controls {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 900px), (pointer: coarse) {
+  .touch-controls {
+    display: block;
+  }
+  .instructions-card {
+    display: none;
+  }
+  .upgrade-cards-grid {
+    grid-template-columns: 1fr;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .glow-title {
+    font-size: 2.8rem;
+  }
+}
+
+.joystick-zone {
+  position: absolute;
+  bottom: 2rem;
+  left: 2rem;
+  width: 120px;
+  height: 120px;
+  pointer-events: auto;
+}
+
+.joystick-base {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(0, 240, 255, 0.4);
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.joystick-thumb {
+  width: 50px;
+  height: 50px;
+  background: var(--border-neon-blue);
+  border-radius: 50%;
+  box-shadow: 0 0 15px var(--border-neon-blue);
+  position: absolute;
+}
+
+.touch-dash-btn {
+  position: absolute;
+  bottom: 2.5rem;
+  right: 2.5rem;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff0077, #ff5500);
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1rem;
+  box-shadow: 0 0 20px rgba(255, 0, 119, 0.6);
+  pointer-events: auto;
+  cursor: pointer;
+}
