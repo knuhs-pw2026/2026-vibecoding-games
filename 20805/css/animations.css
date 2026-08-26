@@ -1,0 +1,126 @@
+/* ==========================================================================
+   Animations & Micro-interactions CSS
+   ========================================================================== */
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-8px); }
+}
+
+.fade-out {
+    animation: fadeOut 0.4s ease forwards;
+}
+
+/* Shake Animation for hit feedback */
+@keyframes shake {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    20% { transform: translate(-8px, 4px) rotate(-3deg); }
+    40% { transform: translate(8px, -4px) rotate(3deg); }
+    60% { transform: translate(-6px, 2px) rotate(-1deg); }
+    80% { transform: translate(6px, -2px) rotate(1deg); }
+}
+
+.shake {
+    animation: shake 0.35s ease-in-out;
+}
+
+/* Floating Damage / Heal Numbers */
+.floating-dmg {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    font-weight: 900;
+    pointer-events: none;
+    animation: floatUpAndFade 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    z-index: 100;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+
+.floating-dmg.damage {
+    color: #ff4d4d;
+    text-shadow: 0 0 10px rgba(255, 77, 77, 0.6);
+}
+
+.floating-dmg.crit {
+    font-size: 2.3rem;
+    color: #ffd700;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+}
+
+.floating-dmg.heal {
+    color: #2ec4b6;
+    text-shadow: 0 0 10px rgba(46, 196, 182, 0.6);
+}
+
+.floating-dmg.buff {
+    color: #c77dff;
+    font-size: 1.4rem;
+}
+
+@keyframes floatUpAndFade {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 10px) scale(0.6);
+    }
+    30% {
+        opacity: 1;
+        transform: translate(-50%, -20px) scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -55px) scale(1);
+    }
+}
+
+/* D20 Dice Rolling Animation */
+@keyframes diceRoll {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+    25% {
+        transform: rotate(180deg) scale(1.15);
+    }
+    50% {
+        transform: rotate(360deg) scale(0.9);
+    }
+    75% {
+        transform: rotate(540deg) scale(1.2);
+    }
+    100% {
+        transform: rotate(720deg) scale(1);
+    }
+}
+
+.d20-dice.rolling {
+    animation: diceRoll 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+    border-color: #ffd700;
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.8);
+}
+
+/* Pulse glow for criticals */
+@keyframes goldPulse {
+    0%, 100% { box-shadow: 0 0 15px var(--gold-glow); }
+    50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+}
+
+.pulse-gold {
+    animation: goldPulse 1.5s infinite ease-in-out;
+}

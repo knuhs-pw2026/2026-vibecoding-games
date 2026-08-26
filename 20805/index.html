@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>그림포지: 버려진 심연 (Grimforge: The Forsaken Depths) - 웹 텍스트 TRPG</title>
+    <meta name="description" content="전사, 마법사, 탱커, 힐러와 함께 즐기는 D20 주사위 턴제 다크 판타지 싱글플레이 TRPG 웹 게임">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <div id="app-container">
+
+        <!-- 1. 타이틀 화면 (Title Screen) -->
+        <div id="view-title" class="screen-title">
+            <div class="game-logo-container">
+                <h1 class="game-title">GRIMFORGE</h1>
+                <div class="game-subtitle">THE FORSAKEN DEPTHS</div>
+            </div>
+            <div class="title-menu">
+                <button id="btn-new-game" class="btn-primary-gold">⚔️ 새로운 여정 시작</button>
+                <button id="btn-continue-game" class="hidden">📜 이어하기</button>
+            </div>
+        </div>
+
+        <!-- 2. 캐릭터 생성 화면 (Character Creation Screen) -->
+        <div id="view-create" class="screen-create hidden">
+            <div class="create-header">
+                <h2>용사의 탄생</h2>
+                <p class="text-secondary">심연의 미궁으로 발을 디딜 영웅의 이름과 직업을 선택하십시오.</p>
+            </div>
+
+            <div class="name-input-group">
+                <label for="char-name-input">용사의 이름</label>
+                <input type="text" id="char-name-input" placeholder="이름을 입력하세요 (기본: 모험가)" maxlength="12" value="엘릭">
+            </div>
+
+            <!-- 직업 선택 그리드 -->
+            <div class="class-select-grid">
+                <div class="class-card-select selected" data-class-id="warrior">
+                    <div class="class-card-icon">⚔️</div>
+                    <div class="class-card-name">전사</div>
+                    <div class="class-card-role">강력한 물리 근접 딜러</div>
+                </div>
+                <div class="class-card-select" data-class-id="mage">
+                    <div class="class-card-icon">🔮</div>
+                    <div class="class-card-name">마법사</div>
+                    <div class="class-card-role">원소 마법 광역 딜러</div>
+                </div>
+                <div class="class-card-select" data-class-id="tank">
+                    <div class="class-card-icon">🛡️</div>
+                    <div class="class-card-name">탱커</div>
+                    <div class="class-card-role">철벽 방어 및 생존 특화</div>
+                </div>
+                <div class="class-card-select" data-class-id="healer">
+                    <div class="class-card-icon">✨</div>
+                    <div class="class-card-name">힐러</div>
+                    <div class="class-card-role">치유 및 신성 지원가</div>
+                </div>
+            </div>
+
+            <!-- 직업 상세 정보 프리뷰 -->
+            <div id="class-detail-preview" class="class-detail-box">
+                <!-- 동적 렌더링 -->
+            </div>
+
+            <div class="create-actions">
+                <button id="btn-back-to-title">뒤로 가기</button>
+                <button id="btn-start-adventure" class="btn-primary-gold">던전 진입하기 ➔</button>
+            </div>
+        </div>
+
+        <!-- 3. 메인 인게임 화면 (In-Game Screen) -->
+        <div id="view-game" class="screen-game hidden">
+            <!-- 상단 상태바 (HUD) -->
+            <div class="top-hud-bar">
+                <div class="hud-player-info">
+                    <div class="hud-name-group">
+                        <span id="top-player-name" class="hud-player-name">엘릭</span>
+                        <span id="top-player-class" class="hud-player-class">전사 Lv.1</span>
+                    </div>
+                </div>
+
+                <div class="hud-vitals">
+                    <div class="vital-container">
+                        <div class="vital-label-row">
+                            <span class="text-red">HP</span>
+                            <span id="top-player-hp-text">100 / 100</span>
+                        </div>
+                        <div class="bar-wrapper">
+                            <div id="top-player-hp-bar" class="bar-fill hp" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    <div class="vital-container">
+                        <div class="vital-label-row">
+                            <span class="text-blue">MP</span>
+                            <span id="top-player-mp-text">50 / 50</span>
+                        </div>
+                        <div class="bar-wrapper">
+                            <div id="top-player-mp-bar" class="bar-fill mp" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hud-meta-group">
+                    <div id="top-player-gold" class="hud-gold">💰 50</div>
+                    <div id="top-player-exp" class="hud-exp">EXP: 0 / 100</div>
+                </div>
+
+                <div class="hud-buttons">
+                    <button id="btn-open-inventory" title="인벤토리 & 장비">🎒 소지품</button>
+                    <button id="btn-open-stats" title="캐릭터 스탯 시트">📊 스탯</button>
+                    <button id="btn-toggle-sound" title="사운드 온/오프"><span id="sound-icon">🔊</span></button>
+                </div>
+            </div>
+
+            <!-- 3-A. 탐험 패널 (Exploration Panel) -->
+            <div id="panel-exploration" class="panel-exploration">
+                <div class="explore-header">
+                    <h2 id="explore-chapter-title" class="explore-chapter-title">Chapter 1</h2>
+                    <div id="explore-node-title" class="explore-node-title">📍 납골당 입구</div>
+                </div>
+
+                <div id="explore-story-text" class="explore-story-box">
+                    지하의 무거운 공기가 감돌고 있습니다...
+                </div>
+
+                <!-- 상인 상점 영역 -->
+                <div id="explore-merchant-container" class="merchant-panel hidden">
+                    <h3>🛒 암상인의 거래처</h3>
+                    <div id="merchant-items-list" class="merchant-items-grid"></div>
+                </div>
+
+                <!-- 선택지 버튼 컨테이너 -->
+                <div id="explore-choices-container" class="explore-choices-container">
+                    <!-- 동적 생성 -->
+                </div>
+            </div>
+
+            <!-- 3-B. 턴제 전투 패널 (Combat Panel) -->
+            <div id="panel-combat" class="panel-combat hidden">
+                <div class="combat-arena">
+                    <!-- 플레이어 파이터 카드 -->
+                    <div class="combat-fighter">
+                        <div id="combat-player-avatar" class="combat-avatar">
+                            <span id="combat-player-icon">⚔️</span>
+                        </div>
+                        <div id="combat-player-name" class="combat-fighter-name">용사</div>
+                        <div class="vital-container" style="width: 100%;">
+                            <div class="vital-label-row">
+                                <span class="text-red">HP</span>
+                                <span id="combat-player-hp-text">100/100</span>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div id="combat-player-hp-bar" class="bar-fill hp" style="width: 100%;"></div>
+                            </div>
+                            <div class="vital-label-row" style="margin-top: 4px;">
+                                <span class="text-blue">MP</span>
+                                <span id="combat-player-mp-text">50/50</span>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div id="combat-player-mp-bar" class="bar-fill mp" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="combat-vs-divider">VS</div>
+
+                    <!-- 몬스터 파이터 카드 -->
+                    <div class="combat-fighter">
+                        <div id="combat-monster-avatar" class="combat-avatar">
+                            <span id="combat-monster-icon">💀</span>
+                        </div>
+                        <div id="combat-monster-name" class="combat-fighter-name">해골 전사</div>
+                        <div class="vital-container" style="width: 100%;">
+                            <div class="vital-label-row">
+                                <span class="text-red">HP</span>
+                                <span id="combat-monster-hp-text">50/50</span>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div id="combat-monster-hp-bar" class="bar-fill hp" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 전투 로그 창 -->
+                <div id="combat-log-box" class="combat-log-box"></div>
+
+                <!-- 전투 커맨드 대시보드 -->
+                <div class="combat-actions-dashboard">
+                    <div class="combat-actions-row">
+                        <button id="btn-combat-attack" class="btn-primary-gold">⚔️ 일반 공격 (D20)</button>
+                        <button id="btn-combat-defend">🛡️ 방어 태세 (MP회복)</button>
+                        <button id="btn-combat-flee">🏃 도주 시도</button>
+                    </div>
+
+                    <!-- 직업 스킬 목록 -->
+                    <div class="combat-skills-grid" id="combat-skills-container"></div>
+
+                    <!-- 전투 아이템 목록 -->
+                    <div class="combat-items-container" id="combat-items-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================================================================
+             모달 창 모음 (D20 주사위, 인벤토리, 스탯 시트, 챕터 완료, 게임오버, 승리)
+             ================================================================== -->
+        
+        <!-- 1. D20 주사위 롤 모달 -->
+        <div id="dice-modal" class="modal">
+            <div class="modal-card dice-modal-content">
+                <div id="dice-reason-text" class="dice-reason-text">행동 판정</div>
+                <div id="dice-dc-text" class="dice-dc-text">목표 난이도 (DC): 12</div>
+
+                <div class="d20-dice-container">
+                    <div id="d20-dice" class="d20-dice">
+                        <span class="dice-number">20</span>
+                    </div>
+                </div>
+
+                <div id="dice-result-text" class="dice-result-text">주사위를 굴리는 중...</div>
+            </div>
+        </div>
+
+        <!-- 2. 인벤토리 및 장비 모달 -->
+        <div id="inventory-modal" class="modal">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3>🎒 소지품 및 장비</h3>
+                    <button class="modal-close-btn">&times;</button>
+                </div>
+                
+                <h4 style="margin-bottom: 8px;">장착된 장비</h4>
+                <div class="equipment-slots-row">
+                    <div id="equipped-weapon-slot" class="equipment-slot"></div>
+                    <div id="equipped-armor-slot" class="equipment-slot"></div>
+                    <div id="equipped-accessory-slot" class="equipment-slot"></div>
+                </div>
+
+                <h4 style="margin-bottom: 8px;">배낭 보관함</h4>
+                <div id="inventory-items-grid" class="inventory-items-grid"></div>
+            </div>
+        </div>
+
+        <!-- 3. 캐릭터 스탯 시트 모달 -->
+        <div id="stats-modal" class="modal">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3 id="stat-sheet-name">캐릭터 정보</h3>
+                    <button class="modal-close-btn">&times;</button>
+                </div>
+
+                <div class="stat-sheet-top" style="display: flex; justify-content: space-between; margin-bottom: 16px; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px;">
+                    <div><span class="text-gold" id="stat-sheet-level">Lv.1</span> | EXP: <span id="stat-sheet-exp">0/100</span></div>
+                    <div>공격력: <strong id="stat-sheet-atk" class="text-gold">15</strong> | 방어력: <strong id="stat-sheet-def" class="text-blue">4</strong></div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <span style="font-weight: 600;">보유 스탯 포인트: <strong id="stat-free-points" class="text-gold">0</strong></span>
+                </div>
+
+                <div id="stat-sheet-rows">
+                    <!-- 동적 생성 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 챕터 정복 완료 모달 -->
+        <div id="chapter-modal" class="modal">
+            <div class="modal-card" style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 12px;">🏆</div>
+                <h2 id="chapter-modal-title" style="margin-bottom: 12px;">챕터 정복 완료!</h2>
+                <p id="chapter-modal-desc" style="color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6;"></p>
+                <button id="btn-chapter-proceed" class="btn-primary-gold">다음 심연 구역으로 전진</button>
+            </div>
+        </div>
+
+        <!-- 5. 게임 오버 모달 -->
+        <div id="gameover-modal" class="modal">
+            <div class="modal-card" style="text-align: center;">
+                <div style="font-size: 3.5rem; margin-bottom: 12px;">☠️</div>
+                <h2 class="text-red" style="margin-bottom: 12px;">심연에 삼켜졌습니다</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 24px;">당신의 영혼은 버려진 납골당의 차가운 돌바닥 아래 묻혔습니다...</p>
+                <button id="btn-gameover-restart" class="btn-primary-gold">새로운 영웅으로 다시 도전</button>
+            </div>
+        </div>
+
+        <!-- 6. 게임 최종 승리 (엔딩) 모달 -->
+        <div id="victory-modal" class="modal">
+            <div class="modal-card" style="text-align: center;">
+                <div style="font-size: 4rem; margin-bottom: 12px;">👑</div>
+                <h1 style="color: var(--gold-bright); margin-bottom: 12px;">심연의 구원자</h1>
+                <p style="color: var(--text-primary); margin-bottom: 20px; line-height: 1.7;">
+                    축하합니다! 불멸의 폭군 카엘을 쓰러뜨리고 심연의 어둠을 정화했습니다!<br>
+                    당신의 전설적인 이름은 대륙 전역의 음유시인들에 의해 영원히 노래될 것입니다.
+                </p>
+                <button id="btn-victory-restart" class="btn-primary-gold">메인 화면으로</button>
+            </div>
+        </div>
+
+        <!-- 7. 레벨업 & 신규 스킬 습득 축하 모달 -->
+        <div id="levelup-modal" class="modal">
+            <div class="modal-card" style="text-align: center;">
+                <div style="font-size: 3.5rem; margin-bottom: 8px;">🎉</div>
+                <h2 id="levelup-modal-title" class="text-gold" style="margin-bottom: 8px;">LEVEL UP!</h2>
+                <div id="levelup-modal-subtitle" style="font-size: 1.15rem; color: #f0f0f5; margin-bottom: 16px;">레벨이 상승했습니다!</div>
+                <div id="levelup-new-skills-box" class="levelup-skills-container"></div>
+                <div style="font-size: 0.95rem; color: var(--gold-primary); margin: 16px 0; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px;">
+                    ✨ 자유 스탯 포인트 <strong>+3</strong> 획득! (스탯 시트에서 원하는 능력치에 투자하세요)
+                </div>
+                <button id="btn-levelup-confirm" class="btn-primary-gold">확인 및 계속 탐험</button>
+            </div>
+        </div>
+
+        <!-- 토스트 알림 컨테이너 -->
+        <div id="toast-container"></div>
+
+    </div>
+
+    <!-- 스크립트 모듈 로드 -->
+    <script src="js/audio.js"></script>
+    <script src="js/dice.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/combat.js"></script>
+    <script src="js/exploration.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
