@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>심야의 구관: 사라진 시험지와 7대 불가사의 - 학교 미스터리 추리 어드벤처</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+
+  <!-- Background Rain FX Canvas -->
+  <canvas id="rain-canvas"></canvas>
+
+  <!-- Main Game Container -->
+  <main class="game-container">
+    
+    <!-- Top Header -->
+    <header class="game-header">
+      <div class="header-left">
+        <span class="game-logo-badge">MYSTERY</span>
+        <div class="location-info">
+          <span class="location-dot"></span>
+          <span id="header-location-name">2층 본관 교무실</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <div class="chapter-badge">EPISODE 1</div>
+        <div class="time-badge">
+          <span>🕒</span>
+          <span id="header-timer">21:30 (남은 시간: 30분 00초)</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button id="btn-toggle-sound" class="btn-icon" title="배경음/효과음 켜기/끄기">🔊</button>
+        <button id="btn-start-deduction" class="btn-action highlight" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; border: none; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);">
+          ⚖️ 최종 추리
+        </button>
+        <button id="btn-open-notebook" class="btn-notebook-trigger">
+          <span>📋 탐정 수첩</span>
+          <span id="clue-badge-count" class="badge-count">0</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Game Body -->
+    <div class="game-body">
+      
+      <!-- Scene Viewport (Point & Click Investigation) -->
+      <section class="scene-viewport" aria-label="사건 현장 조사 화면">
+        <div id="scene-canvas-wrapper" class="scene-canvas-wrapper"></div>
+        <div id="hotspots-layer" class="hotspots-layer"></div>
+        <div id="character-standee" class="character-standee"></div>
+        <div class="scene-vignette"></div>
+      </section>
+
+      <!-- Right Map / Location Navigation Sidebar -->
+      <aside class="map-sidebar" aria-label="교내 장소 이동 맵">
+        <div class="map-sidebar-header">
+          <div class="map-sidebar-title">
+            <span>🗺️ 교내 장소 이동</span>
+          </div>
+        </div>
+        <div id="map-location-list" class="location-list"></div>
+      </aside>
+
+    </div>
+
+    <!-- Bottom Dialogue Box -->
+    <footer class="dialogue-container">
+      <div class="speaker-profile-box">
+        <div id="speaker-avatar" class="speaker-avatar-circle">🕵️</div>
+        <div id="speaker-name" class="speaker-name">추리부장</div>
+        <div id="speaker-role" class="speaker-role">주인공 (2학년)</div>
+      </div>
+
+      <div class="dialogue-main-box">
+        <div class="dialogue-content">
+          <span id="dialogue-text" class="dialogue-text">수사를 시작합니다...</span>
+          <span id="dialogue-cursor" class="dialogue-cursor"></span>
+        </div>
+
+        <div class="dialogue-controls">
+          <div id="dialogue-choices" class="dialogue-choices"></div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Banner FX (Clue Found & Objection) -->
+    <div id="clue-banner" class="clue-banner">
+      <div id="clue-banner-icon" class="clue-banner-icon">🔍</div>
+      <div class="clue-banner-title">NEW CLUE DISCOVERED!</div>
+      <div id="clue-banner-name" class="clue-banner-name">새로운 단서 획득</div>
+    </div>
+
+    <div id="objection-banner" class="objection-banner">
+      이의 있음!
+    </div>
+
+    <!-- Detective Notebook Modal -->
+    <div id="notebook-modal" class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>📋 탐정 수첩 (Detective Notebook)</span>
+          </div>
+          <button id="btn-close-notebook" class="btn-icon">✕</button>
+        </div>
+
+        <div class="notebook-nav">
+          <button class="notebook-tab active" data-tab="clues">🔍 수집한 단서 & 증거</button>
+          <button class="notebook-tab" data-tab="suspects">👥 용의자 프로필 & 알리바이</button>
+          <button class="notebook-tab" data-tab="timeline">⏱️ 사건 타임라인</button>
+        </div>
+
+        <div class="modal-body">
+          <div id="tab-view-clues">
+            <div id="notebook-clues-grid" class="clues-grid"></div>
+          </div>
+          <div id="tab-view-suspects" style="display: none;">
+            <div id="notebook-suspects-grid" class="suspects-grid"></div>
+          </div>
+          <div id="tab-view-timeline" style="display: none;">
+            <div id="notebook-timeline-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Keypad Puzzle Modal -->
+    <div id="puzzle-modal" class="modal-overlay">
+      <div class="modal-card" style="width: 480px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>🔢 전자 금고 비밀번호 입력</span>
+          </div>
+          <button id="btn-close-puzzle" class="btn-icon">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="puzzle-box">
+            <p class="puzzle-instruction">
+              4자리 보안 비밀번호를 입력하십시오.<br>
+              <strong style="color: var(--accent-gold);">힌트: 탄소(C: 6) + 산소(O: 8) × 10 = ? (4자리)</strong>
+            </p>
+            <div id="keypad-display" class="keypad-display">----</div>
+            <div class="keypad-grid">
+              <button class="keypad-btn keypad-num" data-val="1">1</button>
+              <button class="keypad-btn keypad-num" data-val="2">2</button>
+              <button class="keypad-btn keypad-num" data-val="3">3</button>
+              <button class="keypad-btn keypad-num" data-val="4">4</button>
+              <button class="keypad-btn keypad-num" data-val="5">5</button>
+              <button class="keypad-btn keypad-num" data-val="6">6</button>
+              <button class="keypad-btn keypad-num" data-val="7">7</button>
+              <button class="keypad-btn keypad-num" data-val="8">8</button>
+              <button class="keypad-btn keypad-num" data-val="9">9</button>
+              <button id="btn-keypad-clear" class="keypad-btn action-btn">C</button>
+              <button class="keypad-btn keypad-num" data-val="0">0</button>
+              <button id="btn-keypad-submit" class="keypad-btn confirm-btn">OK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Climax Deduction Modal -->
+    <div id="deduction-modal" class="modal-overlay">
+      <div class="modal-card" style="border: 2px solid var(--accent-crimson);">
+        <div class="modal-header" style="background: rgba(185, 28, 28, 0.2);">
+          <div class="modal-title" style="color: #fca5a5;">
+            <span>⚖️ 클라이맥스 추리 공방 (Truth Trial)</span>
+          </div>
+          <button id="btn-close-deduction" class="btn-icon">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="deduction-container">
+            <div class="deduction-question-box">
+              <div id="deduction-step-badge" class="deduction-step-badge">PHASE 1 / 3</div>
+              <div id="deduction-question-text" class="deduction-question-text">질문 로딩 중...</div>
+            </div>
+            <div id="deduction-options-list" class="deduction-options-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Start Overlay Screen -->
+    <section id="start-screen" class="overlay-screen" aria-label="게임 시작 타이틀 화면">
+      <div class="title-badge">HIGH SCHOOL MYSTERY ADVENTURE</div>
+      <h1 class="game-main-title">심야의 구관: 사라진 시험지</h1>
+      <p class="game-sub-title">기말고사 전날 밤 9시 30분, 잠긴 교무실에서 사라진 수학 시험지의 진실을 밝혀라!</p>
+      
+      <div class="title-actions">
+        <button id="btn-start-game" class="btn-start-game">🎮 수사 시작하기</button>
+        <button id="btn-guide" class="btn-guide">📖 게임 가이드 & 룰</button>
+      </div>
+    </section>
+
+    <!-- Guide Modal -->
+    <div id="guide-modal" class="modal-overlay">
+      <div class="modal-card" style="width: 600px;">
+        <div class="modal-header">
+          <div class="modal-title">📖 수사관 안내 가이드</div>
+          <button id="btn-close-guide" class="btn-icon">✕</button>
+        </div>
+        <div class="modal-body" style="line-height: 1.7; font-size: 0.92rem; color: var(--text-muted);">
+          <h4 style="color: var(--accent-gold); margin-bottom: 8px;">1. 현장 조사 (Point & Click)</h4>
+          <p>교내 맵을 이동하며 화면 속 반짝이는 오브젝트(돋보기 버튼)를 클릭하여 물적 증거와 단서를 수집하세요.</p>
+          <br>
+          <h4 style="color: var(--accent-blue); margin-bottom: 8px;">2. 용의자 심문 & 증거 제시</h4>
+          <p>각 장소에 있는 4명의 용의자와 대화하고, [증거 제시]를 눌러 탐정 수첩의 단서를 들이밀어 알리바이의 모순을 찔러보세요.</p>
+          <br>
+          <h4 style="color: var(--accent-crimson); margin-bottom: 8px;">3. 최종 추리 & 엔딩</h4>
+          <p>충분한 단서를 모았다면 우측 상단의 <strong>[최종 추리]</strong> 버튼을 눌러 침입 수법과 결정적 증거를 해명하고 진범을 지목하세요!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ending Screen -->
+    <section id="ending-screen" class="overlay-screen hidden" aria-label="게임 엔딩 화면">
+      <div id="ending-badge" class="title-badge" style="color: var(--accent-gold);">EPILOGUE</div>
+      <h2 id="ending-title" class="game-main-title" style="font-size: 2rem;">사건 종결</h2>
+      <div id="ending-story-text" style="max-width: 650px; margin: 20px auto 30px; font-size: 1.05rem; line-height: 1.8; color: #e2e8f0; background: rgba(15,23,42,0.8); padding: 24px; border-radius: 12px; border: 1px solid var(--border-subtle);"></div>
+      <button id="btn-restart-game" class="btn-start-game" style="width: 240px;">🔄 다시 플레이하기</button>
+    </section>
+
+  </main>
+
+  <!-- Game Scripts (Compatible with both local file:// and web server) -->
+  <script src="js/bundle.js"></script>
+</body>
+</html>
