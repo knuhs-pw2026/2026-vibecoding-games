@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>검은 그늘 속에서 - 경북대사대부고 축제 탈출 게임</title>
+    <meta name="description" content="경북대학교사범대학부설고등학교 축제 특별 인터랙티브 텍스트 탈출 게임. 어둠에 잠긴 야간 학교에서 수칙을 지키고 무사히 탈출하십시오.">
+    <meta name="theme-color" content="#07080b">
+    
+    <!-- Open Graph for Festival Share -->
+    <meta property="og:title" content="검은 그늘 속에서 - 사대부고 축제 탈출 게임">
+    <meta property="og:description" content="너... 아직도 자습 안 끝났어? 사대부고 야간 괴담 탈출에 도전하세요.">
+    <meta property="og:type" content="website">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/effects.css">
+</head>
+<body>
+
+    <!-- CRT 모니터 스캔라인 오버레이 -->
+    <div class="crt-overlay"></div>
+
+    <!-- 실시간 오염도 비네팅 레이어 -->
+    <div id="vignette-layer"></div>
+
+    <!-- 메인 앱 컨테이너 (모바일 최적화) -->
+    <main id="app-container">
+        
+        <!-- 상단 헤더 -->
+        <header class="game-header">
+            <div class="school-badge">
+                <span class="school-icon">🏫</span>
+                <h1 class="school-name">경북대사대부고 <span>검은 그늘 속에서</span></h1>
+            </div>
+            <div class="header-controls">
+                <button id="btn-open-rules" class="btn-icon btn-rule" style="display: none;" title="행동 수칙서 보기">
+                    📜 수칙서
+                </button>
+                <button id="btn-sound" class="btn-icon" title="배경음 및 효과음">
+                    🔊 소리 ON
+                </button>
+            </div>
+        </header>
+
+        <!-- 상태 표시 패널 (위치 및 오염도 게이지) -->
+        <section class="status-panel" aria-label="플레이어 상태">
+            <div class="location-tag">
+                <span>현재 위치</span>
+                <span id="location-name" class="location-name">경북대사대부고 운동장 (현실)</span>
+            </div>
+            <div class="contamination-container">
+                <div class="contamination-header">
+                    <span>어둠의 침식도 (오염도)</span>
+                    <span id="contamination-val" class="contamination-val">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="progress-fill" class="progress-bar-fill"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 인벤토리 바 -->
+        <section class="inventory-bar" aria-label="소지품">
+            <span class="inventory-label">소지품 :</span>
+            <div id="inventory-container" style="display: flex; gap: 6px;">
+                <div class="item-slot">비어 있음</div>
+            </div>
+        </section>
+
+        <!-- 스토리 텍스트 카드 -->
+        <article id="story-card" class="story-card">
+            <div id="story-text" class="story-text" aria-live="polite"></div>
+            <div class="skip-hint" id="skip-hint">💡 텍스트를 누르면 즉시 전체 내용이 표시됩니다.</div>
+        </article>
+
+        <!-- 선택지 버튼 컨테이너 -->
+        <nav id="choices-container" class="choices-container" aria-label="선택지"></nav>
+
+    </main>
+
+    <!-- 1. 사대부고 야간 행동 수칙서 모달 -->
+    <div id="rule-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="rule-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 id="rule-title" class="modal-title">경북대사대부고 특별 생존 수칙</h2>
+                    <p class="modal-subtitle">※ 202X년 축제 기간 발견된 훼손된 야간 지침서</p>
+                </div>
+                <button id="btn-close-rules" class="btn-close" aria-label="닫기">×</button>
+            </div>
+            <div id="rule-list" class="rule-list">
+                <!-- 동적으로 수칙 카드 삽입 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 축제 탈출 성공 디지털 인증서 모달 (부스 상품 교환용) -->
+    <div id="cert-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cert-title-text">
+        <div class="modal-content" style="border-color: #f59e0b;">
+            <div class="modal-header">
+                <div class="school-badge">
+                    <span class="school-icon">🏆</span>
+                    <span class="school-name">경북대학교사범대학부설고등학교 축제</span>
+                </div>
+                <button id="btn-close-cert" class="btn-close" aria-label="닫기">×</button>
+            </div>
+            
+            <div class="cert-card">
+                <div class="cert-stamp">KNU<br>CERTIFIED<br>사대부고</div>
+                <div class="cert-school">경북대학교사범대학부설고등학교 축제위원회</div>
+                <h2 id="cert-title-text" class="cert-title">학교 축제 탈출 성공 증명서</h2>
+                <div id="cert-badge-text" class="cert-badge">🏆 SURVIVOR</div>
+
+                <div class="cert-info-grid">
+                    <div class="cert-info-item">
+                        <div class="cert-info-label">탈출 랭크</div>
+                        <div id="cert-rank" class="cert-info-val" style="color: #fbbf24;">GRADE 1</div>
+                    </div>
+                    <div class="cert-info-item">
+                        <div class="cert-info-label">소요 시간</div>
+                        <div id="cert-time" class="cert-info-val">3분 42초</div>
+                    </div>
+                    <div class="cert-info-item">
+                        <div class="cert-info-label">최종 오염도</div>
+                        <div id="cert-contam" class="cert-info-val">15%</div>
+                    </div>
+                    <div class="cert-info-item">
+                        <div class="cert-info-label">발급일</div>
+                        <div class="cert-info-val">202X 축제일</div>
+                    </div>
+                </div>
+
+                <div class="cert-code-box">
+                    <div class="cert-code-title">부스 확인용 고유 인증 코드</div>
+                    <div id="cert-code" class="cert-code-number">KNU-789421</div>
+                </div>
+
+                <p class="cert-notice">
+                    📸 이 화면을 <strong>캡처하여 축제 부스 운영진에게 제시</strong>하면 사은품/간식 교환이 가능합니다!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/soundEngine.js"></script>
+    <script src="js/storyData.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
