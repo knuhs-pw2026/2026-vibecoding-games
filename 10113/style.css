@@ -1,0 +1,862 @@
+/* ==========================================================================
+   수박 게임 (Suika Game) - 유러피안 마켓 & 원목 과일 상자 테마 스타일시트
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Jua&family=Outfit:wght@400;600;800;900&family=Noto+Sans+KR:wght@500;700;900&family=Gowun+Batang:wght@400;700&display=swap');
+
+:root {
+  --wood-dark: #3E2723;
+  --wood-medium: #5D4037;
+  --wood-light: #8D6E63;
+  --metal-bronze: #8D7B68;
+  --metal-steel: #78909C;
+  --gold-accent: #FFD700;
+  --orange-accent: #FFA502;
+  --red-accent: #FF4757;
+  --green-accent: #2ED573;
+  --parchment-text: #2C2016;
+  --parchment-sub: #5C4A3A;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 8px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  font-family: 'Jua', 'Noto Sans KR', 'Outfit', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  color: #2F3542;
+  background: url('assets/market_bg.jpg') center center / cover no-repeat fixed #3E2723;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 배경 따뜻한 햇살 앰비언트 오버레이 */
+.market-backdrop-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 40% 30%, rgba(255, 235, 180, 0.15) 0%, rgba(30, 20, 10, 0.45) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 메인 컨테이너 */
+.game-container {
+  display: flex;
+  gap: 24px;
+  max-width: 1100px;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* ==========================================================================
+   좌측: 원목 과일 상자 (Wooden Fruit Crate) & 상단 글래스 헤더
+   ========================================================================== */
+.crate-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 470px;
+}
+
+/* 1. 상단 플로팅 글래스모피즘 헤더 */
+.glass-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 8px 16px;
+  border-radius: var(--radius-lg);
+  border: 1.8px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.score-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.score-title {
+  font-size: 11px;
+  font-weight: 900;
+  color: #5D4037;
+  letter-spacing: 0.8px;
+}
+
+.main-score-val {
+  font-size: 28px;
+  font-weight: 900;
+  color: #D35400;
+  font-family: 'Outfit', sans-serif;
+  line-height: 1.05;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.best-score-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.best-label {
+  font-size: 11px;
+  color: #795548;
+  font-weight: 600;
+}
+
+.new-best-pill {
+  font-size: 9px;
+  font-weight: 900;
+  color: #FFF;
+  background: linear-gradient(135deg, #E67E22, #E74C3C);
+  padding: 1px 5px;
+  border-radius: 6px;
+  animation: bounceTag 0.5s infinite alternate;
+}
+
+@keyframes bounceTag {
+  0% { transform: scale(0.95); }
+  100% { transform: scale(1.08); }
+}
+
+/* NEXT 2단계 미리보기 카드 */
+.next-col {
+  display: flex;
+  justify-content: center;
+}
+
+.next-preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid #FFD54F;
+  box-shadow: 0 4px 12px rgba(230, 126, 34, 0.2);
+}
+
+.next-tag {
+  font-size: 9px;
+  font-weight: 900;
+  color: #D35400;
+  letter-spacing: 0.5px;
+}
+
+.next-canvases-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.next-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.next-arrow-icon {
+  font-size: 11px;
+  color: #E67E22;
+  font-weight: 900;
+}
+
+#nextFruitCanvas1 {
+  width: 44px;
+  height: 44px;
+  display: block;
+}
+
+#nextFruitCanvas2 {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+.next-fruit-name {
+  font-size: 11px;
+  font-weight: 900;
+  color: #D35400;
+}
+
+.next-fruit-name.sub {
+  font-size: 9px;
+  color: #7F8C8D;
+}
+
+/* 헤더 액션 버튼 */
+.actions-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pill-btn {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.2px solid #D7CCC8;
+  border-radius: 20px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #4E342E;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pill-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  border-color: #E67E22;
+  color: #D35400;
+}
+
+.pill-btn:active {
+  transform: scale(0.96);
+}
+
+/* 2. 피버 게이지 스트립 */
+.fever-strip {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(10px);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  border: 1.2px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.fever-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fever-caption {
+  font-size: 11px;
+  font-weight: 900;
+  color: #E67E22;
+  letter-spacing: 0.5px;
+}
+
+.fever-percent {
+  font-size: 11px;
+  font-weight: 900;
+  color: #D35400;
+  font-family: 'Outfit', sans-serif;
+}
+
+.fever-track {
+  width: 100%;
+  height: 9px;
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.25);
+}
+
+.fever-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #F39C12 0%, #E74C3C 50%, #F1C40F 100%);
+  border-radius: 6px;
+  transition: width 0.25s ease-out;
+  box-shadow: 0 0 8px rgba(231, 76, 60, 0.6);
+}
+
+/* 3. 리얼 원목 과일 상자 (Wooden Fruit Crate) */
+.wooden-crate {
+  position: relative;
+  width: 470px;
+  background: url('assets/wooden_crate_texture.jpg') center center / cover #4E342E;
+  padding: 18px 18px 12px 18px;
+  border-radius: 12px;
+  box-shadow: 
+    0 22px 50px rgba(0, 0, 0, 0.6),
+    0 8px 16px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.25),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.6);
+  border: 4px solid #3E2723;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 4개 코너 금속 브레이스 (Metal Corner Brackets with Rivets) */
+.metal-corner {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #B0BEC5 0%, #78909C 50%, #455A64 100%);
+  border: 1.5px solid #CFD8DC;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.metal-corner::before,
+.metal-corner::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, #FFFFFF 20%, #263238 90%);
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.metal-corner.top-left {
+  top: -2px;
+  left: -2px;
+  border-top-left-radius: 10px;
+  clip-path: polygon(0 0, 100% 0, 100% 35%, 35% 35%, 35% 100%, 0 100%);
+}
+.metal-corner.top-left::before { top: 6px; left: 6px; }
+.metal-corner.top-left::after { top: 6px; left: 24px; }
+
+.metal-corner.top-right {
+  top: -2px;
+  right: -2px;
+  border-top-right-radius: 10px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 65% 100%, 65% 35%, 0 35%);
+}
+.metal-corner.top-right::before { top: 6px; right: 6px; }
+.metal-corner.top-right::after { top: 6px; right: 24px; }
+
+.metal-corner.bottom-left {
+  bottom: -2px;
+  left: -2px;
+  border-bottom-left-radius: 10px;
+  clip-path: polygon(0 0, 35% 0, 35% 65%, 100% 65%, 100% 100%, 0 100%);
+}
+.metal-corner.bottom-left::before { bottom: 6px; left: 6px; }
+.metal-corner.bottom-left::after { bottom: 6px; left: 24px; }
+
+.metal-corner.bottom-right {
+  bottom: -2px;
+  right: -2px;
+  border-bottom-right-radius: 10px;
+  clip-path: polygon(65% 0, 100% 0, 100% 100%, 0 100%, 0 65%, 65% 65%);
+}
+.metal-corner.bottom-right::before { bottom: 6px; right: 6px; }
+.metal-corner.bottom-right::after { bottom: 6px; right: 24px; }
+
+/* 상자 내부 캔버스 영역 */
+.canvas-inner-box {
+  position: relative;
+  width: 434px;
+  height: 640px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 
+    inset 0 12px 28px rgba(0, 0, 0, 0.7),
+    inset 0 0 15px rgba(0, 0, 0, 0.6),
+    0 2px 4px rgba(255, 255, 255, 0.15);
+  border: 3px solid #2B1810;
+  background: #3A2315;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+/* 상자 하단 흔들기 명판 버튼 */
+.crate-bottom-tray {
+  width: 100%;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.crate-shake-btn {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 900;
+  font-family: inherit;
+  border-radius: var(--radius-sm);
+  border: 2px solid #8D6E63;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.25);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #FFF;
+}
+
+.crate-shake-btn.shake-ready {
+  background: linear-gradient(180deg, #A04000 0%, #6E2C00 100%);
+  border-color: #D35400;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.crate-shake-btn.shake-ready:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(180deg, #BA4A00 0%, #7E3100 100%);
+  box-shadow: 0 6px 16px rgba(186, 74, 0, 0.45);
+}
+
+.crate-shake-btn.shake-cooldown {
+  background: #5D4037;
+  border-color: #4E342E;
+  color: #BCAAA4;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.crate-shake-btn.shake-exhausted {
+  background: #3E2723;
+  border-color: #2E1C14;
+  color: #795548;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* ==========================================================================
+   우측: 빈티지 파머스 마켓 양피지 간판 (Vintage Market Signboard)
+   ========================================================================== */
+.vintage-signboard {
+  width: 480px;
+  background: url('assets/vintage_parchment.jpg') center center / cover no-repeat #F4ECD8;
+  border-radius: 16px;
+  box-shadow: 
+    0 18px 45px rgba(0, 0, 0, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 0 40px rgba(120, 80, 40, 0.2);
+  border: 4px solid #8D6E63;
+  padding: 24px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--parchment-text);
+  position: relative;
+}
+
+/* 간판 상단 헤더 */
+.signboard-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom: 2px dashed rgba(110, 70, 30, 0.4);
+  padding-bottom: 10px;
+}
+
+.signboard-main-title {
+  font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  color: #3E2723;
+  line-height: 1.25;
+  letter-spacing: -0.2px;
+  text-transform: uppercase;
+}
+
+.market-stamp-box {
+  flex-shrink: 0;
+}
+
+.market-stamp-img {
+  width: 58px;
+  height: 48px;
+  background: radial-gradient(circle, rgba(230, 126, 34, 0.2), transparent 70%);
+  border: 1.5px dashed #8D6E63;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.market-stamp-img::after {
+  content: '🌾 MARKET';
+  font-size: 9px;
+  font-weight: 900;
+  color: #6E2C00;
+}
+
+/* 간판 본문 안내 목록 */
+.signboard-body {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.signboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.section-heading {
+  font-size: 13px;
+  font-weight: 900;
+  color: #4E342E;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.section-heading .icon {
+  font-size: 13px;
+}
+
+.signboard-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-left: 6px;
+}
+
+.signboard-list li {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: #3E2723;
+  position: relative;
+  padding-left: 10px;
+}
+
+.signboard-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #A04000;
+  font-weight: bold;
+}
+
+.signboard-list li strong {
+  color: #21130D;
+  font-weight: 900;
+}
+
+/* 11단계 과일 진화 도감 (미니 카드 그리드) */
+.market-evolution-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  max-height: 150px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.market-evolution-grid::-webkit-scrollbar {
+  width: 4px;
+}
+.market-evolution-grid::-webkit-scrollbar-thumb {
+  background: #A1887F;
+  border-radius: 4px;
+}
+
+.evo-card {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(141, 110, 99, 0.35);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.evo-badge-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 900;
+  color: #FFF;
+  flex-shrink: 0;
+}
+
+.evo-card-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.evo-card-name {
+  font-size: 11px;
+  font-weight: 900;
+  color: #3E2723;
+}
+
+.evo-card-pts {
+  font-size: 9px;
+  font-weight: 700;
+  color: #A04000;
+}
+
+.signboard-footer {
+  margin-top: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px dashed rgba(110, 70, 30, 0.4);
+}
+
+.guide-note {
+  font-size: 11px;
+  color: #4E342E;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   인게임 알림 배너 (Combo, Danger, Fever)
+   ========================================================================== */
+.combo-banner {
+  position: absolute;
+  top: 130px;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  background: linear-gradient(135deg, #E74C3C 0%, #F39C12 100%);
+  color: #FFF;
+  font-size: 18px;
+  font-weight: 900;
+  padding: 5px 18px;
+  border-radius: 25px;
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6);
+  pointer-events: none;
+  transition: transform 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.4);
+  z-index: 10;
+  border: 2px solid #FFF;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.combo-banner.active {
+  transform: translateX(-50%) scale(1);
+  animation: pulseComboBanner 0.35s infinite alternate;
+}
+
+@keyframes pulseComboBanner {
+  0% { transform: translateX(-50%) scale(1); }
+  100% { transform: translateX(-50%) scale(1.12); }
+}
+
+.fever-active-banner {
+  position: absolute;
+  top: 65px;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  background: linear-gradient(135deg, #F1C40F 0%, #E74C3C 100%);
+  color: #FFF;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 5px 15px;
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(241, 196, 15, 0.7);
+  pointer-events: none;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.3);
+  z-index: 12;
+  border: 2px solid #FFF;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.fever-active-banner.active {
+  transform: translateX(-50%) scale(1);
+  animation: pulseFeverBanner 0.4s infinite alternate;
+}
+
+.danger-banner {
+  position: absolute;
+  top: 95px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(231, 76, 60, 0.94);
+  color: #FFF;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 4px 14px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.5);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 10;
+}
+
+.danger-banner.visible {
+  opacity: 1;
+  animation: dangerPulse 0.4s infinite alternate;
+}
+
+@keyframes dangerPulse {
+  0% { transform: translateX(-50%) scale(1); }
+  100% { transform: translateX(-50%) scale(1.05); }
+}
+
+/* ==========================================================================
+   모달 디자인
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 20, 10, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 100;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content.vintage-modal {
+  background: url('assets/vintage_parchment.jpg') center center / cover no-repeat #F4ECD8;
+  width: 90%;
+  max-width: 380px;
+  padding: 26px 20px;
+  border-radius: 16px;
+  border: 4px solid #8D6E63;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  text-align: center;
+  transform: scale(0.85);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: #3E2723;
+}
+
+.modal-overlay.active .modal-content {
+  transform: scale(1);
+}
+
+.modal-emoji {
+  font-size: 42px;
+  margin-bottom: 6px;
+}
+
+.modal-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: #21130D;
+  margin-bottom: 4px;
+}
+
+.modal-desc {
+  font-size: 13px;
+  color: #5D4037;
+  margin-bottom: 16px;
+}
+
+.final-score-box {
+  background: rgba(255, 255, 255, 0.7);
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  border: 1.5px solid rgba(141, 110, 99, 0.4);
+}
+
+.final-score-title {
+  font-size: 11px;
+  color: #6E2C00;
+  font-weight: 700;
+}
+
+.final-score-val {
+  font-size: 30px;
+  font-weight: 900;
+  color: #D35400;
+  font-family: 'Outfit', sans-serif;
+}
+
+.modal-new-best {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #E67E22;
+  animation: bounceTag 0.5s infinite alternate;
+}
+
+.modal-btn {
+  width: 100%;
+  padding: 11px;
+  font-size: 15px;
+  font-weight: 900;
+  font-family: inherit;
+  background: linear-gradient(180deg, #E67E22 0%, #A04000 100%);
+  color: #FFF;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(160, 64, 0, 0.4);
+  transition: all 0.2s ease;
+}
+
+.modal-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(160, 64, 0, 0.55);
+}
+
+/* ==========================================================================
+   반응형 미디어 쿼리
+   ========================================================================== */
+@media (max-width: 980px) {
+  .game-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .crate-stage,
+  .vintage-signboard {
+    width: 470px;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 500px) {
+  body {
+    padding: 8px;
+  }
+
+  .crate-stage,
+  .wooden-crate,
+  .glass-header,
+  .fever-strip,
+  .vintage-signboard {
+    width: 100%;
+  }
+
+  .canvas-inner-box {
+    width: 100%;
+    height: 560px;
+  }
+
+  .main-score-val {
+    font-size: 22px;
+  }
+}

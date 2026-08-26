@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🍉 수박 게임 (Suika Game) - 유러피안 마켓 과일 상자</title>
+  <meta name="description" content="활기찬 유럽 과일 시장에서 즐기는 본격 11단계 수박게임! 리얼한 원목 과일 상자와 빈티지 마켓 간판, 피버 모드, 콤보 시스템을 즐겨보세요.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="market-backdrop-overlay"></div>
+
+  <div class="game-container">
+    <!-- 좌측/중앙: 리얼 우든 과일 상자 (Wooden Fruit Crate) 스테이지 -->
+    <main class="crate-stage">
+      
+      <!-- 상단 플로팅 글래스모피즘 헤더 (점수, NEXT 1/2, 컨트롤) -->
+      <header class="glass-header">
+        <div class="header-col score-col">
+          <span class="score-title">HIGH SCORE</span>
+          <span id="currentScore" class="main-score-val">0</span>
+          <div class="best-score-row">
+            <span class="best-label">최고: <span id="highScore">0</span></span>
+            <span id="newBestBadge" class="new-best-pill" style="display: none;">👑 NEW!</span>
+          </div>
+        </div>
+
+        <!-- NEXT 2단계 미리보기 박스 -->
+        <div class="header-col next-col" title="다음에 떨어질 과일 2개">
+          <div class="next-preview-card">
+            <span class="next-tag">NEXT</span>
+            <div class="next-canvases-row">
+              <div class="next-slot main-slot">
+                <canvas id="nextFruitCanvas1" width="46" height="46"></canvas>
+                <span id="nextFruitName1" class="next-fruit-name">체리</span>
+              </div>
+              <div class="next-arrow-icon">➔</div>
+              <div class="next-slot sub-slot">
+                <canvas id="nextFruitCanvas2" width="34" height="34"></canvas>
+                <span id="nextFruitName2" class="next-fruit-name sub">딸기</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 헤더 액션 버튼 (사운드, 다시하기) -->
+        <div class="header-col actions-col">
+          <button id="soundToggleBtn" class="pill-btn sound-btn" title="사운드 켜기/끄기">🔊 사운드 ON</button>
+          <button id="restartBtn" class="pill-btn restart-btn" title="게임 다시 시작">🔄 다시하기</button>
+        </div>
+      </header>
+
+      <!-- 피버 게이지 바 -->
+      <div class="fever-strip">
+        <div class="fever-label-row">
+          <span class="fever-caption">🔥 FEVER GAUGE</span>
+          <span id="feverStatusText" class="fever-percent">0%</span>
+        </div>
+        <div class="fever-track">
+          <div id="feverBarFill" class="fever-progress" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- 리얼 원목 과일 상자 프레임 -->
+      <div id="woodenCrate" class="wooden-crate">
+        
+        <!-- 4개 코너 금속 브레이스 (Metallic Corner Brackets with Rivets) -->
+        <div class="metal-corner top-left"></div>
+        <div class="metal-corner top-right"></div>
+        <div class="metal-corner bottom-left"></div>
+        <div class="metal-corner bottom-right"></div>
+
+        <!-- 상자 내부 캔버스 래퍼 -->
+        <div class="canvas-inner-box">
+          <canvas id="gameCanvas"></canvas>
+          <div id="comboBadge" class="combo-banner">🔥 COMBO x2!</div>
+          <div id="feverBanner" class="fever-active-banner">💥 FEVER MODE (3x 점수 & 과일 폭탄)! 💥</div>
+          <div id="dangerWarning" class="danger-banner">⚠️ 위험! 과일이 넘칩니다!</div>
+        </div>
+
+        <!-- 상자 하단 원목/황동 명판 흔들기 버튼 -->
+        <div class="crate-bottom-tray">
+          <button id="shakeBtn" class="crate-shake-btn shake-ready" title="과일이 끼였을 때 상자를 좌우로 흔들어 섞습니다 (쿨타임 15초 / 게임당 3회)">
+            📳 상자 흔들기 (3/3회) [S]
+          </button>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- 우측: 빈티지 파머스 마켓 양피지 간판 (Vintage Market Signboard) -->
+    <aside class="vintage-signboard">
+      
+      <!-- 빈티지 간판 상단 헤더 & 파머스 마켓 스탬프 -->
+      <div class="signboard-top">
+        <div class="signboard-title-group">
+          <h1 class="signboard-main-title">PROJECT FINAL RELEASE: FEEDBACK-DRIVEN UPGRADE & IMPLEMENTATION PLAN [FINAL VERSION]</h1>
+        </div>
+        <div class="market-stamp-box">
+          <div class="market-stamp-img"></div>
+        </div>
+      </div>
+
+      <!-- 간판 본문 안내 목록 -->
+      <div class="signboard-body">
+        
+        <!-- 섹션 1: 핵심 게임 개선 -->
+        <div class="signboard-section">
+          <h3 class="section-heading"><span class="icon">⭐</span> 핵심 게임 개선 반영</h3>
+          <ul class="signboard-list">
+            <li><strong>11단계 과일 물리/점수 확장:</strong> 체리부터 수박까지 정교한 크기 및 점수 차등 적용</li>
+            <li><strong>실시간 착지 가이드라인:</strong> 점선 가이드 및 예상 착지 지점 고스트 과일(Ghost Fruit) 투사</li>
+            <li><strong>과즙 파티클 & 점수 연출:</strong> 과일 합성 시 팡 터지는 과즙 및 플로팅 점수 텍스트</li>
+          </ul>
+        </div>
+
+        <!-- 섹션 2: UI/UX 디자인 변경 -->
+        <div class="signboard-section">
+          <h3 class="section-heading"><span class="icon">🎨</span> UI/UX 디자인 변경</h3>
+          <ul class="signboard-list">
+            <li><strong>유러피안 야외 과일 시장 테마:</strong> 따뜻한 햇살의 시장 거리 풍경 배경</li>
+            <li><strong>리얼 원목 과일 상자(Fruit Crate):</strong> 메탈 코너 브레이스와 깊이감 있는 우드 질감</li>
+            <li><strong>동적 'NEXT' 2단계 리스트:</strong> 다음 과일(NEXT 1) 및 그 다음 과일(NEXT 2) 듀얼 미리보기</li>
+          </ul>
+        </div>
+
+        <!-- 섹션 3: 게임 시스템 추가 -->
+        <div class="signboard-section">
+          <h3 class="section-heading"><span class="icon">⚔️</span> 게임 시스템 추가</h3>
+          <ul class="signboard-list">
+            <li><strong>Combo 시스템:</strong> 1.5초 이내 연속 합성 시 <strong>2배, 3배, 4배</strong> 점수 획득</li>
+            <li><strong>Fever 모드:</strong> 게이지 100% 충전 시 5초간 <strong>3배 점수 + 과일 폭탄 충격파</strong> 발동</li>
+            <li><strong>상자 흔들기(Shake):</strong> 끼인 과일을 섞는 흔들기 기능 (15초 쿨타임 / 게임당 3회)</li>
+          </ul>
+        </div>
+
+        <!-- 섹션 4: 기술 구현 체크리스트 -->
+        <div class="signboard-section">
+          <h3 class="section-heading"><span class="icon">📋</span> 기술 구현 체크리스트</h3>
+          <ul class="signboard-list">
+            <li><strong>LocalStorage:</strong> 브라우저를 닫아도 최고 점수 영구 보존 및 신기록 축하 폭죽 연출</li>
+            <li><strong>Zero-CORS Web Audio API:</strong> 100% 절차적 사운드로 로컬 파일(file://) 오류 원천 방지</li>
+            <li><strong>Server-less 호환:</strong> 단일 통합 스크립트로 로컬/웹 서버 완벽 동작</li>
+          </ul>
+        </div>
+
+        <!-- 11단계 과일 진화 도감 (미니 카드 그리드) -->
+        <div class="signboard-section evolution-section">
+          <h3 class="section-heading"><span class="icon">✨</span> 과일 진화 도감 (11단계)</h3>
+          <div id="evolutionLadder" class="market-evolution-grid">
+            <!-- JS로 동적 렌더링 -->
+          </div>
+        </div>
+
+        <!-- 사용자 실행 바로가기 -->
+        <div class="signboard-footer">
+          <p class="guide-note">💡 <strong>조작법:</strong> 마우스 이동으로 조준 &bull; 클릭/스페이스바로 투하 &bull; [S] 상자 흔들기</p>
+        </div>
+
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- 게임 오버 모달 -->
+  <div id="gameOverModal" class="modal-overlay">
+    <div class="modal-content vintage-modal">
+      <div class="modal-emoji">😵</div>
+      <h2 class="modal-title">게임 오버!</h2>
+      <p class="modal-desc">과일이 상자 밖으로 넘쳤습니다.</p>
+      
+      <div class="final-score-box">
+        <div class="final-score-title">최종 획득 점수</div>
+        <div id="finalScoreVal" class="final-score-val">0</div>
+        <div id="modalNewBest" class="modal-new-best" style="display: none;">👑 최고 기록 경신! 🎉</div>
+      </div>
+
+      <button id="modalRestartBtn" class="modal-btn">다시 도전하기 🚀 (Space)</button>
+    </div>
+  </div>
+
+  <!-- 거대 수박 탄생 축하 모달 -->
+  <div id="celebrationModal" class="modal-overlay">
+    <div class="modal-content vintage-modal">
+      <div class="modal-emoji">🎉</div>
+      <h2 id="celebTitle" class="modal-title">🍉 전설의 거대 수박 완성!</h2>
+      <p id="celebMsg" class="modal-desc">축하합니다! 최고 등급의 11단계 수박을 완성했습니다!</p>
+      <button id="celebContinueBtn" class="modal-btn">계속 플레이하기 ✨</button>
+    </div>
+  </div>
+
+  <!-- Matter.js 2D 물리 엔진 및 통합 게임 스크립트 -->
+  <script src="js/matter.min.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
