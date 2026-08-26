@@ -1,0 +1,2619 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>너에게 닿는 마지막 문 (The Last Door to You) - 플레이어블 감성 방탈출</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Pretendard:wght@300;400;500;600;700;800&family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070b16;
+      --bg-card: rgba(15, 23, 42, 0.85);
+      --bg-card-hover: rgba(30, 41, 69, 0.95);
+      --accent-warm: #f59e0b;
+      --accent-amber: #fbbf24;
+      --accent-rose: #f43f5e;
+      --accent-cyan: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.12);
+      --border-gold: rgba(245, 158, 11, 0.4);
+      --font-main: 'Pretendard', sans-serif;
+      --font-serif: 'Nanum Myeongjo', serif;
+      --font-en: 'Outfit', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Bar */
+    .app-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: rgba(10, 15, 29, 0.9);
+      border-bottom: 1px solid var(--border-color);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #f59e0b, #f43f5e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #fff;
+      font-size: 16px;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+    }
+    .brand-title {
+      font-weight: 700;
+      font-size: 16px;
+      color: #fff;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: var(--accent-amber);
+      font-family: var(--font-en);
+      letter-spacing: 0.5px;
+    }
+
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .mode-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-color);
+      color: #cbd5e1;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .mode-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+    .mode-btn.active {
+      background: var(--accent-warm);
+      color: #0f172a;
+      border-color: var(--accent-warm);
+      font-weight: 700;
+    }
+
+    /* Main Container */
+    #main-app {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* VIEW 1: GAME SCREEN */
+    #game-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px 20px 30px;
+    }
+
+    /* Title Splash Overlay */
+    #title-screen {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, #1e1b4b 0%, #070b16 85%);
+      z-index: 80;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 24px;
+    }
+    .title-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: var(--accent-amber);
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+    .game-main-title {
+      font-family: var(--font-serif);
+      font-size: 46px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      background: linear-gradient(180deg, #ffffff 0%, #fef08a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
+    }
+    .game-main-sub {
+      font-family: var(--font-en);
+      font-size: 18px;
+      color: var(--accent-warm);
+      letter-spacing: 2px;
+      margin-bottom: 24px;
+    }
+    .title-story-quote {
+      max-width: 600px;
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      font-style: italic;
+      margin-bottom: 40px;
+    }
+    .btn-start-game {
+      background: linear-gradient(135deg, #f59e0b, #f43f5e);
+      color: #fff;
+      border: none;
+      padding: 16px 44px;
+      font-size: 18px;
+      font-weight: 700;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(244, 63, 94, 0.4);
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-start-game:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 14px 30px rgba(244, 63, 94, 0.6);
+    }
+
+    /* Game Header Stats & Chapter Title */
+    .game-statusbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 12px 20px;
+      margin-bottom: 14px;
+      backdrop-filter: blur(10px);
+    }
+    .current-chapter-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .chap-badge {
+      background: var(--accent-warm);
+      color: #0f172a;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-family: var(--font-en);
+    }
+    .chap-title-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .game-actions-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-lens-toggle {
+      background: rgba(6, 182, 212, 0.15);
+      border: 1px solid rgba(6, 182, 212, 0.4);
+      color: #38bdf8;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-lens-toggle:hover {
+      background: rgba(6, 182, 212, 0.25);
+    }
+    .btn-lens-toggle.locked {
+      opacity: 0.55;
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
+    }
+    .btn-lens-toggle.active {
+      background: #06b6d4;
+      color: #0f172a;
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.6);
+      border-color: #38bdf8;
+    }
+
+    /* Flashback Anime Theater Modal */
+    .flashback-anime-theater {
+      background: radial-gradient(circle at center, #261528 0%, #0c0814 85%);
+      border: 2px solid var(--accent-amber);
+      box-shadow: 0 0 60px rgba(245, 158, 11, 0.4), inset 0 0 30px rgba(245, 158, 11, 0.15);
+      border-radius: 24px;
+      padding: 24px 28px;
+      max-width: 720px;
+      width: 100%;
+      position: relative;
+      animation: flashbackZoom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    @keyframes flashbackZoom {
+      from { opacity: 0; transform: scale(0.88); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .flashback-top-bar {
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .flashback-tag {
+      font-size: 11px;
+      color: var(--accent-warm);
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .flashback-heading {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      color: #fef08a;
+      margin-top: 2px;
+    }
+    .flashback-stage-scene {
+      height: 240px;
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, rgba(0, 0, 0, 0.5) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 10px 30px 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .fb-actor-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.35s ease;
+      z-index: 10;
+    }
+    .fb-actor-box.dimmed {
+      opacity: 0.4;
+      transform: scale(0.92);
+      filter: grayscale(35%);
+    }
+    .fb-actor-box.speaking {
+      opacity: 1;
+      transform: scale(1.05);
+      filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.7));
+    }
+    .fb-actor-sprite {
+      width: 130px;
+      height: 180px;
+    }
+    .fb-actor-tag {
+      margin-top: 4px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-color);
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+    .fb-actor-box.speaking .fb-actor-tag {
+      background: var(--accent-amber);
+      color: #0f172a;
+      border-color: var(--accent-amber);
+      font-weight: 800;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+    }
+    .fb-scene-ambient {
+      position: absolute;
+      left: 50%;
+      top: 40%;
+      transform: translate(-50%, -50%);
+      font-size: 46px;
+      opacity: 0.22;
+      pointer-events: none;
+      filter: blur(0.5px);
+      animation: pulseHover 3s infinite;
+    }
+    .flashback-dialogue-box {
+      margin-top: 14px;
+      background: rgba(10, 15, 30, 0.95);
+      border: 1.5px solid var(--accent-amber);
+      border-radius: 16px;
+      padding: 14px 20px;
+      position: relative;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+    }
+    .fb-current-speaker {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--accent-amber);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .fb-dialogue-text {
+      font-size: 15px;
+      color: #f8fafc;
+      line-height: 1.65;
+      min-height: 52px;
+      font-family: var(--font-main);
+    }
+    .fb-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .fb-step-indicator {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+    .btn-fb-next {
+      background: linear-gradient(135deg, #f59e0b, #f43f5e);
+      color: #fff;
+      border: none;
+      padding: 8px 22px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(244, 63, 94, 0.4);
+    }
+    .btn-fb-next:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(244, 63, 94, 0.6);
+    }
+
+    /* Interactive Stage Canvas / Room Box */
+    .room-stage {
+      position: relative;
+      height: 520px;
+      border-radius: 20px;
+      background: #0d1326;
+      border: 2px solid var(--border-color);
+      overflow: hidden;
+      box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.8), 0 15px 35px rgba(0, 0, 0, 0.6);
+      transition: all 0.6s ease;
+    }
+    .room-stage.lens-mode-active {
+      background: radial-gradient(circle at center, #2e1065 0%, #0f172a 80%);
+      border-color: var(--accent-amber);
+      box-shadow: inset 0 0 80px rgba(245, 158, 11, 0.25), 0 0 30px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Ambient particles */
+    .particles-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.04) 0%, transparent 8%),
+        radial-gradient(circle at 75% 60%, rgba(245, 158, 11, 0.05) 0%, transparent 12%),
+        radial-gradient(circle at 40% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 10%);
+    }
+
+    /* Room Background Visuals (CSS Illustrations) */
+    .room-scenery {
+      position: absolute;
+      inset: 0;
+      transition: all 0.5s ease;
+    }
+    .room-floor {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 120px;
+      background: linear-gradient(180deg, #131b31 0%, #0a0e1c 100%);
+      border-top: 2px solid rgba(255, 255, 255, 0.08);
+    }
+    .room-window {
+      position: absolute;
+      top: 40px;
+      left: 60px;
+      width: 130px;
+      height: 170px;
+      border: 4px solid #334155;
+      border-radius: 8px 8px 0 0;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+      overflow: hidden;
+    }
+    .window-light {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.15), transparent 70%);
+      opacity: 0.3;
+      transition: opacity 0.5s;
+    }
+    .lens-mode-active .window-light {
+      opacity: 1;
+      background: radial-gradient(circle at top right, rgba(254, 240, 138, 0.4), transparent 70%);
+    }
+
+    /* Rain Effect for Chapter 2 */
+    .rain-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: none;
+    }
+    .lens-mode-active .rain-container {
+      opacity: 0.1;
+    }
+
+    /* Interactive Clickable Hotspots (오브젝트) */
+    .hotspot {
+      position: absolute;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 40;
+    }
+    .hotspot:hover {
+      transform: translateY(-6px) scale(1.06);
+    }
+    .hotspot-icon {
+      font-size: 44px;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));
+      position: relative;
+    }
+    .hotspot-tag {
+      margin-top: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.85);
+      border: 1px solid var(--border-color);
+      color: #f1f5f9;
+      white-space: nowrap;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+    }
+    .hotspot:hover .hotspot-tag {
+      background: var(--accent-warm);
+      color: #0f172a;
+      border-color: var(--accent-warm);
+    }
+    .hotspot-glow {
+      position: absolute;
+      inset: -10px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.3) 0%, transparent 70%);
+      opacity: 0;
+      animation: pulseHover 2s infinite;
+    }
+    .hotspot:hover .hotspot-glow {
+      opacity: 1;
+    }
+    @keyframes pulseHover {
+      0%, 100% { transform: scale(0.9); opacity: 0.3; }
+      50% { transform: scale(1.2); opacity: 0.8; }
+    }
+
+    /* Solved / Completed Hotspot State (Unclickable) */
+    .hotspot.solved {
+      pointer-events: none !important;
+      opacity: 0.45 !important;
+      filter: grayscale(40%) !important;
+      cursor: default !important;
+      transform: none !important;
+    }
+    .hotspot.solved .hotspot-tag {
+      background: rgba(30, 41, 59, 0.9) !important;
+      color: #94a3b8 !important;
+      border-color: #475569 !important;
+      text-decoration: line-through;
+    }
+    .hotspot.solved .hotspot-glow {
+      display: none !important;
+    }
+
+    /* Memory Ghost (과거 렌즈 모드에서만 보이는 오브젝트) */
+    .memory-ghost {
+      display: none;
+      opacity: 0;
+      animation: ghostFade 0.6s forwards;
+    }
+    .lens-mode-active .memory-ghost {
+      display: flex;
+    }
+    @keyframes ghostFade {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Animated Anime Daughter Character in Stage */
+    .stage-character-actor {
+      position: absolute;
+      bottom: 20px;
+      left: 25px;
+      z-index: 45;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .stage-character-actor:hover {
+      transform: scale(1.04);
+    }
+    .actor-sprite-box {
+      width: 120px;
+      height: 195px;
+      position: relative;
+      animation: actorBreath 3.5s ease-in-out infinite alternate;
+      transform-origin: bottom center;
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.7));
+    }
+    @keyframes actorBreath {
+      0% { transform: translateY(0) scaleY(1); }
+      100% { transform: translateY(-5px) scaleY(1.02); }
+    }
+    .actor-talking .actor-sprite-box {
+      animation: actorTalk 0.3s ease-in-out 4 alternate;
+    }
+    @keyframes actorTalk {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-6px) scale(1.04); }
+    }
+    .actor-nameplate {
+      margin-top: 3px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--accent-amber);
+      color: #fef08a;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+      backdrop-filter: blur(6px);
+    }
+    .actor-emote {
+      position: absolute;
+      top: -24px;
+      right: 10px;
+      font-size: 20px;
+      filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.6));
+      animation: emoteFloat 2s infinite ease-in-out;
+    }
+    @keyframes emoteFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    /* In-Stage Anime Speech Bubble - Directly Anchored to Daughter */
+    .stage-speech-bubble {
+      position: absolute;
+      bottom: 225px;
+      left: 25px;
+      z-index: 55;
+      max-width: 440px;
+      width: calc(100% - 240px);
+      background: rgba(10, 15, 30, 0.95);
+      border: 2px solid var(--accent-amber);
+      border-radius: 16px;
+      padding: 13px 18px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), 0 0 25px rgba(245, 158, 11, 0.3);
+      backdrop-filter: blur(14px);
+      animation: bubblePop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes bubblePop {
+      from { opacity: 0; transform: scale(0.85) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .stage-speech-bubble::before {
+      content: '';
+      position: absolute;
+      bottom: -11px;
+      left: 36px;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 11px 11px 0 0;
+      border-color: var(--accent-amber) transparent transparent transparent;
+    }
+    .bubble-speaker {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--accent-amber);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+    .bubble-text {
+      font-size: 14px;
+      color: #f8fafc;
+      line-height: 1.6;
+      font-family: var(--font-main);
+    }
+
+    /* Inventory Bar */
+    .inventory-wrapper {
+      margin-top: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .inv-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .inv-slots {
+      display: flex;
+      gap: 10px;
+      flex: 1;
+      overflow-x: auto;
+    }
+    .inv-slot {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .inv-slot.filled {
+      border-style: solid;
+      border-color: rgba(245, 158, 11, 0.5);
+      background: rgba(245, 158, 11, 0.1);
+    }
+    .inv-slot.selected {
+      border-color: var(--accent-warm);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.6);
+      transform: scale(1.08);
+    }
+    .inv-tooltip {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      display: none;
+      pointer-events: none;
+      z-index: 50;
+    }
+    .inv-slot:hover .inv-tooltip {
+      display: block;
+    }
+
+    /* Modal / Puzzle Inspection Overlays */
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.show {
+      display: flex;
+      animation: modalFade 0.25s ease;
+    }
+    @keyframes modalFade {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .puzzle-card {
+      background: #111827;
+      border: 1px solid var(--border-gold);
+      border-radius: 20px;
+      padding: 28px;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+    }
+    .puzzle-close {
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .puzzle-close:hover { color: #fff; }
+    .puzzle-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .puzzle-hint {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    /* Dial & Clock Puzzle UI */
+    .dial-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .dial-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .dial-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      width: 44px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .dial-btn:hover { background: rgba(255, 255, 255, 0.2); }
+    .dial-display {
+      width: 44px;
+      height: 48px;
+      background: #030712;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent-amber);
+    }
+    .btn-submit-puzzle {
+      background: var(--accent-warm);
+      color: #0f172a;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-submit-puzzle:hover {
+      background: #fbbf24;
+      transform: translateY(-2px);
+    }
+
+    /* Piano Keyboard UI for Chapter 2 */
+    .piano-board {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      background: #020617;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      gap: 4px;
+    }
+    .piano-key {
+      width: 46px;
+      height: 140px;
+      background: #f8fafc;
+      color: #0f172a;
+      border-radius: 0 0 6px 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.1s;
+      border: 1px solid #cbd5e1;
+    }
+    .piano-key:active, .piano-key.pressed {
+      background: #fef08a;
+      transform: translateY(4px);
+    }
+
+    /* VIEW 2: GDD DOCUMENT VIEW (기획서) */
+    #doc-view {
+      display: none;
+      padding: 30px 20px 80px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .doc-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 30px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(12px);
+    }
+    .doc-h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent-amber);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .doc-p {
+      color: #cbd5e1;
+      font-size: 14.5px;
+      line-height: 1.8;
+      margin-bottom: 12px;
+    }
+
+    /* Ending Epilogue Overlay */
+    #ending-screen {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, #1e112a 0%, #05050b 90%);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 30px;
+      animation: modalFade 1s forwards;
+    }
+    .ending-heart {
+      font-size: 60px;
+      margin-bottom: 16px;
+      animation: pulseHover 2s infinite;
+    }
+    .ending-title {
+      font-family: var(--font-serif);
+      font-size: 34px;
+      color: #fef08a;
+      margin-bottom: 16px;
+    }
+    .ending-msg {
+      max-width: 620px;
+      font-size: 16px;
+      line-height: 1.9;
+      color: #e2e8f0;
+      margin-bottom: 30px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .room-stage { height: 380px; }
+      .game-main-title { font-size: 32px; }
+      .piano-key { width: 34px; height: 110px; font-size: 11px; }
+      .dialogue-wrapper { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Navigation -->
+  <header class="app-topbar">
+    <div class="brand">
+      <div class="brand-icon">扉</div>
+      <div>
+        <div class="brand-title">너에게 닿는 마지막 문</div>
+        <div class="brand-sub">The Last Door to You</div>
+      </div>
+    </div>
+    <div class="top-controls">
+      <button class="mode-btn active" id="btn-tab-game" onclick="switchView('game')">
+        🎮 게임 플레이 (Play Game)
+      </button>
+      <button class="mode-btn" id="btn-tab-doc" onclick="switchView('doc')">
+        📄 기획서 원문 (View GDD)
+      </button>
+      <button class="mode-btn" id="btn-sound-toggle" onclick="toggleBGM()">
+        🔊 사운드 ON
+      </button>
+    </div>
+  </header>
+
+  <main id="main-app">
+
+    <!-- ==================== VIEW 1: PLAYABLE ESCAPE ROOM GAME ==================== -->
+    <div id="game-view">
+      
+      <!-- Title Screen Overlay -->
+      <div id="title-screen">
+        <div class="title-badge">✨ 감성 스토리텔링 인터랙티브 방탈출 어드벤처</div>
+        <h1 class="game-main-title">너에게 닿는 마지막 문</h1>
+        <div class="game-main-sub">THE LAST DOOR TO YOU : 시간을 엮는 기억의 방</div>
+        <p class="title-story-quote">
+          "딸 하은이의 깊은 무의식 세계에 갇힌 아빠 시우.<br>
+          방의 문들을 열고 나가기 위해, 잊고 살았던 지난날의 추억과 상처의 퍼즐들을 마주한다."
+        </p>
+        <button class="btn-start-game" onclick="startGame()">
+          <span>기억 속으로 들어가기 (Game Start)</span>
+          <span>→</span>
+        </button>
+      </div>
+
+      <!-- Game Status Bar -->
+      <div class="game-statusbar">
+        <div class="current-chapter-info">
+          <span class="chap-badge" id="hud-chapter-badge">CH 1</span>
+          <span class="chap-title-text" id="hud-chapter-title">멈춰버린 시계의 서재 (7세)</span>
+        </div>
+        <div class="game-actions-bar">
+          <button class="btn-lens-toggle locked" id="hud-lens-btn" onclick="toggleMemoryLens()">
+            🔒 기억의 렌즈 (잠김)
+          </button>
+        </div>
+      </div>
+
+      <!-- Room Exploration Stage -->
+      <div class="room-stage" id="stage-room">
+        <div class="particles-layer"></div>
+
+        <!-- Room Scene Visual Elements -->
+        <div class="room-scenery">
+          <div class="room-window">
+            <div class="window-light"></div>
+          </div>
+          <div class="room-floor"></div>
+        </div>
+
+        <!-- ================= CHAPTER 1 HOTSPOTS ================= -->
+        <div id="layer-chapter-1">
+          <!-- 1. 괘종시계 -->
+          <div class="hotspot" id="hs-clock" style="top: 110px; right: 50px;" onclick="openClockPuzzle()">
+            <div class="hotspot-glow"></div>
+            <div class="hotspot-icon">🕰️</div>
+            <div class="hotspot-tag" id="hs-clock-tag">멈춰버린 괘종시계</div>
+          </div>
+
+          <!-- 2. 서재 책상 -->
+          <div class="hotspot" id="hs-desk" style="bottom: 25px; left: 35%; transform: translateX(-50%);" onclick="inspectDesk()">
+            <div class="hotspot-glow"></div>
+            <div class="hotspot-icon">🪑</div>
+            <div class="hotspot-tag" id="hs-desk-tag">오래된 책상 서랍</div>
+          </div>
+
+          <!-- 3. 분홍 자전거 -->
+          <div class="hotspot" id="hs-bike" style="bottom: 25px; left: 63%; transform: translateX(-50%);" onclick="openBikePuzzle()">
+            <div class="hotspot-glow"></div>
+            <div class="hotspot-icon">🚲</div>
+            <div class="hotspot-tag" id="hs-bike-tag">분홍색 자전거</div>
+          </div>
+
+          <!-- 4. 탈출 문 -->
+          <div class="hotspot" id="hs-door-1" style="bottom: 25px; right: 35px;" onclick="tryEscapeDoor()">
+            <div class="hotspot-glow"></div>
+            <div class="hotspot-icon" id="ch1-door-icon">🚪🔒</div>
+            <div class="hotspot-tag">잠긴 기억의 문</div>
+          </div>
+
+          <!-- 5. 과거 렌즈로만 보이는 하은이의 크레파스 그림 (Ghost) -->
+          <div class="hotspot memory-ghost" id="hs-drawing" style="top: 120px; left: 45%; transform: translateX(-50%);" onclick="inspectDrawing()">
+            <div class="hotspot-glow" style="opacity:1;"></div>
+            <div class="hotspot-icon">🖍️✨</div>
+            <div class="hotspot-tag" id="hs-drawing-tag" style="background: var(--accent-amber); color:#000;">[과거의 흔적] 하은이의 그림</div>
+          </div>
+        </div>
+
+        <!-- ================= CHAPTER 2 HOTSPOTS ================= -->
+        <div id="layer-chapter-2" style="display:none;">
+          <!-- 1. 비에 젖은 화분 -->
+          <div class="hotspot" id="hs-plant" style="bottom: 25px; left: 35%; transform: translateX(-50%);" onclick="inspectFlowerPot()">
+            <div class="hotspot-glow"></div>
+            <div class="hotspot-icon">🪴</div>
+            <div class="hotspot-tag" id="hs-plant-tag">비에 젖은 화분</div>
+          </div>
+
+          <!-- 2. 업라이트 피아노 -->
+          <div class="hotspot" id="hs-piano" style="bottom: 25px; left: 63%; transform: translateX(-50%);" onclick="openPianoPuzzle()">
+            <div class="hotspot-glow"></div>
+            <div class="hotspot-icon">🎹</div>
+            <div class="hotspot-tag" id="hs-piano-tag">업라이트 피아노</div>
+          </div>
+
+          <!-- 3. Ch2 탈출 문 -->
+          <div class="hotspot" id="hs-door-2" style="bottom: 25px; right: 35px;" onclick="tryEscapeDoor2()">
+            <div class="hotspot-glow"></div>
+            <div class="hotspot-icon" id="ch2-door-icon">🌿🚪🔒</div>
+            <div class="hotspot-tag">덩굴로 닫힌 온실 문</div>
+          </div>
+
+          <!-- 4. Ch2 과거 렌즈 흔적 -->
+          <div class="hotspot memory-ghost" id="hs-score" style="top: 115px; right: 130px;" onclick="inspectGhostScore()">
+            <div class="hotspot-glow" style="opacity:1;"></div>
+            <div class="hotspot-icon">🎼✨</div>
+            <div class="hotspot-tag" id="hs-score-tag" style="background: var(--accent-amber); color:#000;">[과거의 기억] 찢겨진 악보</div>
+          </div>
+        </div>
+
+        <!-- ================= CHAPTER 3 HOTSPOTS ================= -->
+        <div id="layer-chapter-3" style="display:none;">
+          <!-- 1. 아빠의 낡은 코트 -->
+          <div class="hotspot" id="hs-coat" style="top: 115px; left: 45%; transform: translateX(-50%);" onclick="inspectCoat()">
+            <div class="hotspot-glow"></div>
+            <div class="hotspot-icon">🧥</div>
+            <div class="hotspot-tag" id="hs-coat-tag">아빠의 오래된 코트</div>
+          </div>
+
+          <!-- 2. 암실 현상대 -->
+          <div class="hotspot" id="hs-photo" style="bottom: 25px; left: 35%; transform: translateX(-50%);" onclick="inspectPhotoDesk()">
+            <div class="hotspot-glow"></div>
+            <div class="hotspot-icon">📷</div>
+            <div class="hotspot-tag" id="hs-photo-tag">빛바랜 사진과 현상액</div>
+          </div>
+
+          <!-- 3. 비밀 금고 -->
+          <div class="hotspot" id="hs-safe" style="bottom: 25px; left: 63%; transform: translateX(-50%);" onclick="openSafePuzzle()">
+            <div class="hotspot-glow"></div>
+            <div class="hotspot-icon">🗄️</div>
+            <div class="hotspot-tag" id="hs-safe-tag">비밀 금고</div>
+          </div>
+
+          <!-- 4. Ch3 탈출 문 -->
+          <div class="hotspot" id="hs-door-3" style="bottom: 25px; right: 35px;" onclick="tryEscapeDoor3()">
+            <div class="hotspot-glow"></div>
+            <div class="hotspot-icon" id="ch3-door-icon">🚪🔒</div>
+            <div class="hotspot-tag">진실의 문</div>
+          </div>
+        </div>
+
+        <!-- ================= CHAPTER 4 FINALE HOTSPOTS ================= -->
+        <div id="layer-chapter-4" style="display:none;">
+          <div class="hotspot" style="top: 50%; left: 62%; transform: translate(-50%, -40%);" onclick="openFinaleDialogue()">
+            <div class="hotspot-glow" style="opacity:1;"></div>
+            <div class="hotspot-icon" style="font-size:60px;">🌌💖🚪</div>
+            <div class="hotspot-tag" style="background:linear-gradient(135deg,#f59e0b,#f43f5e); color:#fff; font-size:13px; padding:6px 14px;">
+              [마지막 문] 딸 하은이의 품으로
+            </div>
+          </div>
+        </div>
+        <!-- ================= IN-STAGE ANIMATED DAUGHTER CHARACTER & SPEECH BUBBLE ================= -->
+        <div class="stage-speech-bubble" id="in-stage-bubble">
+          <div class="bubble-speaker" id="bubble-speaker">
+            <span id="bubble-avatar">🌸</span>
+            <span id="bubble-name">딸 강하은 (7세)</span>
+          </div>
+          <div class="bubble-text" id="bubble-text">
+            "아빠! 우리 집 서재야. 서랍 속에서 [돋보기 렌즈]를 먼저 찾아 과거를 비춰보자!"
+          </div>
+        </div>
+
+        <div class="stage-character-actor" id="in-stage-character" onclick="interactWithDaughter()">
+          <div class="actor-emote" id="actor-emote-icon">🌸</div>
+          <div class="actor-sprite-box" id="actor-sprite-box">
+            <!-- Dynamic high-detail Anime Daughter SVG loaded by JS -->
+          </div>
+          <div class="actor-nameplate" id="actor-nameplate">딸 강하은 (7세)</div>
+        </div>
+
+      </div>
+
+      <!-- Inventory Bar -->
+      <div class="inventory-wrapper">
+        <div class="inv-title">🎒 소지품<br>(Inventory)</div>
+        <div class="inv-slots" id="inv-container">
+          <div class="inv-slot" id="slot-0"><span class="inv-tooltip">비어있음</span></div>
+          <div class="inv-slot" id="slot-1"><span class="inv-tooltip">비어있음</span></div>
+          <div class="inv-slot" id="slot-2"><span class="inv-tooltip">비어있음</span></div>
+          <div class="inv-slot" id="slot-3"><span class="inv-tooltip">비어있음</span></div>
+          <div class="inv-slot" id="slot-4"><span class="inv-tooltip">비어있음</span></div>
+        </div>
+      </div>
+
+      <!-- Modal: Clock Puzzle (Ch 1) -->
+      <div class="modal-backdrop" id="modal-clock">
+        <div class="puzzle-card">
+          <button class="puzzle-close" onclick="closeModal('modal-clock')">✕</button>
+          <div style="font-size:40px; margin-bottom:10px;">🕰️</div>
+          <h3 class="puzzle-title">멈춘 괘종시계의 시간 맞추기</h3>
+          <p class="puzzle-hint">
+            "아빠가 매일 밤 야근을 마치고 문을 열고 들어오던 그 시간...<br>
+            하은이는 항상 문 앞에서 아빠를 기다리고 있었습니다."
+          </p>
+          <div class="dial-inputs">
+            <div class="dial-col">
+              <button class="dial-btn" onclick="adjustTime('hour', 1)">▲</button>
+              <div class="dial-display" id="disp-hour">12</div>
+              <button class="dial-btn" onclick="adjustTime('hour', -1)">▼</button>
+              <span style="font-size:11px; color:#94a3b8;">시(Hour)</span>
+            </div>
+            <div style="font-size:28px; font-weight:bold; padding-top:40px; color:#94a3b8;">:</div>
+            <div class="dial-col">
+              <button class="dial-btn" onclick="adjustTime('min', 5)">▲</button>
+              <div class="dial-display" id="disp-min">00</div>
+              <button class="dial-btn" onclick="adjustTime('min', -5)">▼</button>
+              <span style="font-size:11px; color:#94a3b8;">분(Minute)</span>
+            </div>
+          </div>
+          <button class="btn-submit-puzzle" onclick="checkClockPuzzle()">시간 맞추기</button>
+        </div>
+      </div>
+
+      <!-- Modal: Bicycle Lock Puzzle (Ch 1) -->
+      <div class="modal-backdrop" id="modal-bike">
+        <div class="puzzle-card">
+          <button class="puzzle-close" onclick="closeModal('modal-bike')">✕</button>
+          <div style="font-size:40px; margin-bottom:10px;">🚲</div>
+          <h3 class="puzzle-title">자전거 바구니 자물쇠 (4자리 번호)</h3>
+          <p class="puzzle-hint">
+            "하은이의 생일이었을까? 아니면 약속했던 그 날일까?<br>
+            [기억의 렌즈]로 과거의 그림을 관찰해보자."
+          </p>
+          <div class="dial-inputs">
+            <div class="dial-col">
+              <button class="dial-btn" onclick="adjustDial('d1', 1)">▲</button>
+              <div class="dial-display" id="d1">0</div>
+              <button class="dial-btn" onclick="adjustDial('d1', -1)">▼</button>
+            </div>
+            <div class="dial-col">
+              <button class="dial-btn" onclick="adjustDial('d2', 1)">▲</button>
+              <div class="dial-display" id="d2">0</div>
+              <button class="dial-btn" onclick="adjustDial('d2', -1)">▼</button>
+            </div>
+            <div class="dial-col">
+              <button class="dial-btn" onclick="adjustDial('d3', 1)">▲</button>
+              <div class="dial-display" id="d3">0</div>
+              <button class="dial-btn" onclick="adjustDial('d3', -1)">▼</button>
+            </div>
+            <div class="dial-col">
+              <button class="dial-btn" onclick="adjustDial('d4', 1)">▲</button>
+              <div class="dial-display" id="d4">0</div>
+              <button class="dial-btn" onclick="adjustDial('d4', -1)">▼</button>
+            </div>
+          </div>
+          <button class="btn-submit-puzzle" onclick="checkBikeLock()">자물쇠 풀기</button>
+        </div>
+      </div>
+
+      <!-- Modal: Piano Puzzle (Ch 2) -->
+      <div class="modal-backdrop" id="modal-piano">
+        <div class="puzzle-card" style="max-width:600px;">
+          <button class="puzzle-close" onclick="closeModal('modal-piano')">✕</button>
+          <div style="font-size:40px; margin-bottom:10px;">🎹</div>
+          <h3 class="puzzle-title">온실 속 피아노 건반 연주</h3>
+          <p class="puzzle-hint" id="piano-hint-text">
+            "하은이와 함께 연주하던 4음절의 멜로디...<br>
+            악보에 적힌 음계를 올바른 순서대로 눌러주세요."
+          </p>
+          <div style="font-size:13px; color:#38bdf8; margin-bottom:10px;" id="piano-input-display">
+            연주된 음계 : [ 대기 중 ]
+          </div>
+          <div class="piano-board">
+            <div class="piano-key" onclick="playKey('도', 261.63)">도 (C)</div>
+            <div class="piano-key" onclick="playKey('레', 293.66)">레 (D)</div>
+            <div class="piano-key" onclick="playKey('미', 329.63)">미 (E)</div>
+            <div class="piano-key" onclick="playKey('파', 349.23)">파 (F)</div>
+            <div class="piano-key" onclick="playKey('솔', 392.00)">솔 (G)</div>
+            <div class="piano-key" onclick="playKey('라', 440.00)">라 (A)</div>
+            <div class="piano-key" onclick="playKey('시', 493.88)">시 (B)</div>
+            <div class="piano-key" onclick="playKey('높은도', 523.25)">높은도 (C5)</div>
+          </div>
+          <button class="btn-submit-puzzle" onclick="resetPianoInput()" style="background:rgba(255,255,255,0.1); color:#fff;">다시 치기</button>
+        </div>
+      </div>
+
+      <!-- Modal: Safe Puzzle (Ch 3) -->
+      <div class="modal-backdrop" id="modal-safe">
+        <div class="puzzle-card">
+          <button class="puzzle-close" onclick="closeModal('modal-safe')">✕</button>
+          <div style="font-size:40px; margin-bottom:10px;">🗄️</div>
+          <h3 class="puzzle-title">아빠의 비밀 금고 (비밀번호)</h3>
+          <p class="puzzle-hint">
+            "코트 속 영수증과 처방전에 적힌 중요한 기념일...<br>
+            딸의 독립과 졸업을 축하하던 그 해의 비밀번호를 입력하세요."
+          </p>
+          <div class="dial-inputs">
+            <div class="dial-col">
+              <button class="dial-btn" onclick="adjustDial('s1', 1)">▲</button>
+              <div class="dial-display" id="s1">1</div>
+              <button class="dial-btn" onclick="adjustDial('s1', -1)">▼</button>
+            </div>
+            <div class="dial-col">
+              <button class="dial-btn" onclick="adjustDial('s2', 1)">▲</button>
+              <div class="dial-display" id="s2">0</div>
+              <button class="dial-btn" onclick="adjustDial('s2', -1)">▼</button>
+            </div>
+            <div class="dial-col">
+              <button class="dial-btn" onclick="adjustDial('s3', 1)">▲</button>
+              <div class="dial-display" id="s3">2</div>
+              <button class="dial-btn" onclick="adjustDial('s3', -1)">▼</button>
+            </div>
+            <div class="dial-col">
+              <button class="dial-btn" onclick="adjustDial('s4', 1)">▲</button>
+              <div class="dial-display" id="s4">0</div>
+              <button class="dial-btn" onclick="adjustDial('s4', -1)">▼</button>
+            </div>
+          </div>
+          <button class="btn-submit-puzzle" onclick="checkSafeCode()">금고 열기</button>
+        </div>
+      </div>
+
+      <!-- Modal: Memory Flashback Cutscene (Interactive Anime Visual Novel Theatre) -->
+      <div class="modal-backdrop" id="modal-flashback">
+        <div class="flashback-anime-theater">
+          <!-- Top Title Bar -->
+          <div class="flashback-top-bar">
+            <div class="flashback-tag" id="flashback-subtitle">MEMORY CUTSCENE</div>
+            <h3 class="flashback-heading" id="flashback-title">등 뒤에서 흘리던 아빠의 땀방울</h3>
+          </div>
+
+          <!-- Interactive Anime Stage with Dad & Daughter Sprites -->
+          <div class="flashback-stage-scene">
+            <!-- Left Actor: Dad -->
+            <div class="fb-actor-box" id="fb-actor-dad">
+              <div class="fb-actor-sprite" id="fb-dad-svg-container">
+                <!-- Detailed Dad SVG loaded by JS -->
+              </div>
+              <div class="fb-actor-tag">👨‍👧 아빠 강시우</div>
+            </div>
+
+            <!-- Center Memory Ambient Icon -->
+            <div class="fb-scene-ambient">
+              <div id="fb-ambient-icon">🚲🌸</div>
+            </div>
+
+            <!-- Right Actor: Daughter -->
+            <div class="fb-actor-box" id="fb-actor-daughter">
+              <div class="fb-actor-sprite" id="fb-daughter-svg-container">
+                <!-- Detailed Daughter SVG loaded by JS -->
+              </div>
+              <div class="fb-actor-tag" id="fb-daughter-tag">🌸 딸 강하은 (7세)</div>
+            </div>
+          </div>
+
+          <!-- Dialogue Box at the Bottom of Cutscene -->
+          <div class="flashback-dialogue-box">
+            <div class="fb-current-speaker" id="fb-speaker-name">
+              <span id="fb-speaker-icon">🌸</span>
+              <span id="fb-speaker-text">딸 강하은 (7세)</span>
+            </div>
+            <div class="fb-dialogue-text" id="fb-dialogue-line">
+              "아빠... 손 절대 놓으면 안 돼요! 넘어질 것 같아요..."
+            </div>
+            <div class="fb-controls">
+              <span class="fb-step-indicator" id="fb-step-indicator">대화 1 / 4</span>
+              <button class="btn-fb-next" id="btn-fb-next" onclick="nextFlashbackStep()">
+                다음 대화 ▶
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ending Screen (Climax) -->
+      <div id="ending-screen">
+        <div class="ending-heart">💖🌸🕊️</div>
+        <h2 class="ending-title">"아빠, 사랑해. 이제 편히 쉬어도 돼..."</h2>
+        <p class="ending-msg">
+          빛 너머로 열린 문의 끝에는 병실 침대에 누워 사경을 헤매는 아빠 시우와,<br>
+          아빠의 마지막 뇌파가 꺼지기 전 진심을 전하기 위해 울며 손을 꼭 쥐고 있는 딸 하은이가 있었습니다.<br><br>
+          평생을 짓눌렀던 죄책감과 후회는 눈부신 은하수가 되어 흩어지고,<br>
+          두 사람은 가장 따스했던 사랑의 기억 속에서 영원히 함께하게 됩니다.
+        </p>
+        <button class="btn-start-game" onclick="restartGame()" style="background:var(--accent-warm); color:#0f172a;">
+          다시 처음부터 플레이하기 🔄
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ==================== VIEW 2: GDD DOCUMENT VIEW (기획서) ==================== -->
+    <div id="doc-view">
+      <div class="doc-section">
+        <h2 class="doc-h2">📑 프로젝트 개요: 너에게 닿는 마지막 문 (The Last Door to You)</h2>
+        <p class="doc-p">
+          <strong>장르 :</strong> 감성 내러티브 스토리 방탈출 어드벤처 | <strong>타깃 :</strong> PC (Steam), 모바일<br>
+          <strong>핵심 콘셉트 :</strong> 딸의 무의식 속에 갇힌 아빠가 기억의 퍼즐을 풀며 탈출하는 여정인 줄 알았으나, 사실은 임종을 앞둔 아빠를 위해 딸이 준비한 마지막 사랑의 배웅이었음을 밝혀내는 눈물겨운 휴먼 드라마.
+        </p>
+      </div>
+
+      <div class="doc-section">
+        <h2 class="doc-h2">🎮 4대 핵심 게임플레이 메커니즘</h2>
+        <p class="doc-p">
+          <strong>1. 기억의 렌즈 (Reminiscence Lens) :</strong> 차가운 현재 공간을 렌즈로 비추면 과거 따스했던 당시의 단서와 메시지가 시각적으로 복원되는 시스템.<br>
+          <strong>2. 감정의 오르골 & 피아노 조율 :</strong> 추억의 멜로디 조각을 직접 연주하여 잠긴 비밀 공간을 개방하는 사운드 인터랙션.<br>
+          <strong>3. 시간의 폴라로이드 :</strong> 과거의 사진을 현상하며 전하지 못한 편지와 날짜를 획득.<br>
+          <strong>4. 진심의 일기장 :</strong> 챕터 클리어 시마다 부녀의 시점이 교차 서술되며 깊은 감정적 카타르시스를 선사.
+        </p>
+      </div>
+
+      <div class="doc-section">
+        <h2 class="doc-h2">📖 챕터별 구성 요약</h2>
+        <p class="doc-p">
+          - <strong>Ch 1. 멈춰버린 시계의 서재 (7세) :</strong> 자전거의 약속과 종이 메달 획득.<br>
+          - <strong>Ch 2. 비 내리는 온실과 피아노 (14세) :</strong> 사춘기의 다툼과 빗소리 피아노 듀엣 연주.<br>
+          - <strong>Ch 3. 빛바랜 병실의 서재 (20세) :</strong> 딸의 독립과 아빠의 숨겨진 투병 일기.<br>
+          - <strong>Ch 4. 은하수가 흐르는 마지막 문 (진실) :</strong> 진짜 진실의 반전과 감동의 작별 인사.
+        </p>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // ================= SOUND SYNTHESIZER (Web Audio API) =================
+    let audioCtx = null;
+    let bgmOsc = null;
+    let bgmGain = null;
+    let isSoundOn = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        playAmbientChords();
+      }
+    }
+
+    function toggleBGM() {
+      const btn = document.getElementById('btn-sound-toggle');
+      isSoundOn = !isSoundOn;
+      if (!isSoundOn) {
+        btn.textContent = '🔇 사운드 OFF';
+        if (bgmGain) bgmGain.gain.setValueAtTime(0, audioCtx.currentTime);
+      } else {
+        btn.textContent = '🔊 사운드 ON';
+        initAudio();
+        if (bgmGain) bgmGain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      }
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.4, vol = 0.2) {
+      if (!isSoundOn) return;
+      initAudio();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e){}
+    }
+
+    function playAmbientChords() {
+      if (!isSoundOn || !audioCtx) return;
+      try {
+        bgmGain = audioCtx.createGain();
+        bgmGain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        bgmGain.connect(audioCtx.destination);
+
+        const chordFreqs = [220, 261.63, 329.63, 392.00]; // A minor 7 warm ambient
+        chordFreqs.forEach(freq => {
+          const osc = audioCtx.createOscillator();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          osc.connect(bgmGain);
+          osc.start();
+        });
+      } catch(e){}
+    }
+
+    function playSFX(type) {
+      if (!isSoundOn) return;
+      if (type === 'click') playTone(800, 'sine', 0.1, 0.1);
+      if (type === 'unlock') {
+        playTone(523.25, 'sine', 0.15, 0.2);
+        setTimeout(() => playTone(659.25, 'sine', 0.2, 0.25), 100);
+        setTimeout(() => playTone(783.99, 'sine', 0.3, 0.3), 200);
+      }
+      if (type === 'lens') playTone(987.77, 'triangle', 0.4, 0.15);
+      if (type === 'error') playTone(180, 'sawtooth', 0.2, 0.2);
+    }
+
+    // ================= GAME STATE MANAGEMENT =================
+    const gameState = {
+      chapter: 1,
+      hasLens: false,
+      lensActive: false,
+      inventory: [],
+      ch1: {
+        clockSolved: false,
+        bikeSolved: false,
+        gotMedal: false,
+        gotCrayonClue: false,
+        hour: 12,
+        min: 0,
+        d1: 0, d2: 0, d3: 0, d4: 0
+      },
+      ch2: {
+        gotScore: false,
+        pianoSequence: [],
+        pianoSolved: false
+      },
+      ch3: {
+        gotPrescription: false,
+        gotLetter: false,
+        safeSolved: false,
+        s1: 1, s2: 0, s3: 2, s4: 0
+      }
+    };
+
+    let currentFlashbackCallback = null;
+    let fbState = {
+      active: false,
+      chapterType: null,
+      step: 0,
+      dialogues: []
+    };
+
+    const flashbackData = {
+      ch1: {
+        subtitle: '7세의 회상 · 아빠의 첫 번째 기억',
+        title: '「등 뒤에서 흘리던 아빠의 땀방울」',
+        ambient: '🚲🌸',
+        daughterAge: 1,
+        daughterTag: '🌸 딸 강하은 (7세)',
+        dialogues: [
+          {
+            speaker: 'daughter',
+            name: '딸 강하은 (7세)',
+            icon: '🌸',
+            text: '"아빠... 손 절대 놓으면 안 돼요! 자전거 넘어질 것 같아서 너무 무서워요..."'
+          },
+          {
+            speaker: 'dad',
+            name: '아빠 강시우',
+            icon: '👨‍👧',
+            text: '"하은아, 아빠가 뒤에서 두 손으로 안장을 꼭 잡고 있어. 아무 걱정 말고 앞만 보고 힘차게 발을 굴려보렴."'
+          },
+          {
+            speaker: 'daughter',
+            name: '딸 강하은 (7세)',
+            icon: '🌸',
+            text: '"와아...! 자전거가 앞으로 가요! ...어? 아빠, 손 놓으신 거예요?!"'
+          },
+          {
+            speaker: 'dad',
+            name: '아빠 강시우',
+            icon: '👨‍👧',
+            text: '"하은이가 스스로 해낸 거야. 앞으로도 아빠는 언제나 네 등 뒤에 있을 테니, 넌 앞만 보고 힘차게 날아가렴."'
+          }
+        ]
+      },
+      ch2: {
+        subtitle: '14세의 회상 · 아빠의 두 번째 기억',
+        title: '「피아노 콩쿠르와 따뜻한 유자차」',
+        ambient: '🎹☕',
+        daughterAge: 2,
+        daughterTag: '🎹 딸 강하은 (14세)',
+        dialogues: [
+          {
+            speaker: 'daughter',
+            name: '딸 강하은 (14세)',
+            icon: '🎹',
+            text: '"아빠... 손이 꽁꽁 얼어서 안 움직여요. 이번 콩쿠르 망치면 어떡하죠...?"'
+          },
+          {
+            speaker: 'dad',
+            name: '아빠 강시우',
+            icon: '👨‍👧',
+            text: '(코트 주머니에서 따끈한 캔 유자차를 꺼내 딸의 차가운 양손을 감싸 쥐어주며) "이거 꼭 쥐어보렴. 손이 많이 차갑네..."'
+          },
+          {
+            speaker: 'daughter',
+            name: '딸 강하은 (14세)',
+            icon: '🎹',
+            text: '"아빠... 손이 사르르 따뜻해졌어요..."'
+          },
+          {
+            speaker: 'dad',
+            name: '아빠 강시우',
+            icon: '👨‍👧',
+            text: '"틀려도 괜찮아, 하은아. 아빠 귀에는 네가 치는 모든 건반 소리가 세상에서 제일 아름다운 음악이란다."'
+          }
+        ]
+      },
+      ch3: {
+        subtitle: '20세의 회상 · 아빠의 세 번째 기억',
+        title: '「서울행 버스와 숨겨진 눈물」',
+        ambient: '🧥🚌',
+        daughterAge: 3,
+        daughterTag: '🧥 딸 강하은 (20세)',
+        dialogues: [
+          {
+            speaker: 'daughter',
+            name: '딸 강하은 (20세)',
+            icon: '🧥',
+            text: '"아빠, 이제 버스 출발해요! 저 서울 가서 장학금도 타고 공부 열심히 할게요!"'
+          },
+          {
+            speaker: 'dad',
+            name: '아빠 강시우',
+            icon: '👨‍👧',
+            text: '"그래, 밥 꼬박꼬박 챙겨 먹고... 힘들면 언제든 전화하렴. 사랑한다, 내 딸."'
+          },
+          {
+            speaker: 'dad',
+            name: '아빠 (홀로 남겨진 정류장)',
+            icon: '💧',
+            text: '"콜록... 쿨럭... 하은아... 건강하게만 자라주렴. 아빠는 딸에게 절대 짐이 되지 않을게..." (가슴을 쥐어뜯으며)'
+          },
+          {
+            speaker: 'daughter',
+            name: '딸 강하은 (현재의 깨달음)',
+            icon: '😭',
+            text: '"아빠... 왜 그때 나한테 아프다고 말 안 했어요... 왜 혼자서 다 견딘 거예요..."'
+          }
+        ]
+      }
+    };
+
+    function triggerFlashback(type, callback) {
+      currentFlashbackCallback = callback;
+      initAudio();
+      playTone(523.25, 'triangle', 0.8, 0.25);
+      setTimeout(() => playTone(659.25, 'triangle', 0.8, 0.25), 150);
+      setTimeout(() => playTone(783.99, 'triangle', 0.8, 0.25), 300);
+      setTimeout(() => playTone(1046.50, 'triangle', 1.2, 0.3), 450);
+
+      const data = flashbackData[type];
+      if (!data) return;
+
+      fbState.active = true;
+      fbState.chapterType = type;
+      fbState.step = 0;
+      fbState.dialogues = data.dialogues;
+
+      document.getElementById('flashback-subtitle').textContent = data.subtitle;
+      document.getElementById('flashback-title').textContent = data.title;
+      document.getElementById('fb-ambient-icon').textContent = data.ambient;
+      document.getElementById('fb-daughter-tag').textContent = data.daughterTag;
+
+      // Render Cutscene Dad & Daughter SVGs
+      document.getElemen    // ================= HIGH DETAIL ANIME VECTOR SPRITES =================
+    function getDadSVG() {
+      return `
+        <svg viewBox="0 0 140 220" width="100%" height="100%" style="overflow:visible;">
+          <defs>
+            <radialGradient id="dadSkin" cx="50%" cy="45%" r="55%">
+              <stop offset="0%" stop-color="#fff8f2"/>
+              <stop offset="70%" stop-color="#fed7aa"/>
+              <stop offset="100%" stop-color="#fbcfe8"/>
+            </radialGradient>
+            <linearGradient id="dadHairBase" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#3b2314"/>
+              <stop offset="50%" stop-color="#24140a"/>
+              <stop offset="100%" stop-color="#120904"/>
+            </linearGradient>
+            <linearGradient id="dadHairShine" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="rgba(254, 215, 170, 0)"/>
+              <stop offset="50%" stop-color="rgba(254, 215, 170, 0.45)"/>
+              <stop offset="100%" stop-color="rgba(254, 215, 170, 0)"/>
+            </linearGradient>
+            <linearGradient id="dadCoatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#334155"/>
+              <stop offset="60%" stop-color="#1e293b"/>
+              <stop offset="100%" stop-color="#0f172a"/>
+            </linearGradient>
+            <radialGradient id="dadIris" cx="50%" cy="40%" r="50%">
+              <stop offset="0%" stop-color="#b45309"/>
+              <stop offset="60%" stop-color="#78350f"/>
+              <stop offset="100%" stop-color="#1e1b4b"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Shadow Base -->
+          <ellipse cx="70" cy="216" rx="42" ry="6" fill="#000000" opacity="0.35"/>
+
+          <!-- Body / Overcoat -->
+          <path d="M 28 106 L 112 106 L 126 215 L 14 215 Z" fill="url(#dadCoatGrad)"/>
+          
+          <!-- Inner Vest & Crisp White Shirt -->
+          <polygon points="70,146 50,106 90,106" fill="#f8fafc"/>
+          <polygon points="70,110 56,106 62,135 70,144" fill="#cbd5e1" opacity="0.6"/>
+          <!-- Blue Patterned Tie -->
+          <polygon points="70,114 66,140 74,140" fill="#3b82f6"/>
+          <polygon points="70,140 63,168 70,178 77,168" fill="#1d4ed8"/>
+          <line x1="67" y1="148" x2="73" y2="152" stroke="#93c5fd" stroke-width="1"/>
+          <line x1="66" y1="158" x2="74" y2="162" stroke="#93c5fd" stroke-width="1"/>
+
+          <!-- Coat Lapels with Shadowed Seams -->
+          <path d="M 32 106 L 60 168 L 48 215" stroke="#475569" stroke-width="2.5" fill="none"/>
+          <path d="M 108 106 L 80 168 L 92 215" stroke="#475569" stroke-width="2.5" fill="none"/>
+          <!-- Coat Pocket & Handkerchief -->
+          <line x1="38" y1="145" x2="48" y2="147" stroke="#64748b" stroke-width="2"/>
+          <polygon points="41,145 44,139 46,145" fill="#f8fafc"/>
+
+          <!-- Neck & Shading -->
+          <rect x="62" y="88" width="16" height="22" fill="url(#dadSkin)"/>
+          <polygon points="62,98 78,98 70,108" fill="#e2b197" opacity="0.6"/>
+
+          <!-- Head Shape -->
+          <ellipse cx="70" cy="64" rx="27" ry="29" fill="url(#dadSkin)"/>
+
+          <!-- Hair - Back Layer -->
+          <path d="M 36 60 Q 30 26 70 24 Q 110 26 104 60 Q 110 88 102 96 Q 92 68 70 68 Q 48 68 38 96 Z" fill="url(#dadHairBase)"/>
+          <!-- Hair Gloss Highlight Arch -->
+          <ellipse cx="70" cy="42" rx="24" ry="7" fill="url(#dadHairShine)"/>
+
+          <!-- Hair Bangs - Finely Cut Layers -->
+          <path d="M 36 50 Q 52 34 70 46 Q 88 34 104 50 Q 92 64 80 52 Q 70 65 56 52 Q 44 64 36 50 Z" fill="url(#dadHairBase)"/>
+          <path d="M 60 46 Q 67 60 70 68 Q 73 58 78 48 Z" fill="#3b2314"/>
+          <path d="M 44 48 Q 50 58 54 62 Q 52 54 48 48 Z" fill="#24140a"/>
+
+          <!-- Loving, Kind Anime Eyes -->
+          <!-- Left Eye -->
+          <path d="M 46 58 Q 55 54 62 58" stroke="#1e1b4b" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+          <ellipse cx="54" cy="64" rx="5.2" ry="6.2" fill="url(#dadIris)"/>
+          <circle cx="54" cy="64" r="2.8" fill="#0f172a"/>
+          <circle cx="56" cy="62" r="1.8" fill="#ffffff"/>
+          <circle cx="52" cy="66" r="0.9" fill="#fed7aa"/>
+          <path d="M 47 69 Q 54 71 61 69" stroke="#cbd5e1" stroke-width="0.8" fill="none"/>
+
+          <!-- Right Eye -->
+          <path d="M 78 58 Q 85 54 94 58" stroke="#1e1b4b" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+          <ellipse cx="86" cy="64" rx="5.2" ry="6.2" fill="url(#dadIris)"/>
+          <circle cx="86" cy="64" r="2.8" fill="#0f172a"/>
+          <circle cx="88" cy="62" r="1.8" fill="#ffffff"/>
+          <circle cx="84" cy="66" r="0.9" fill="#fed7aa"/>
+          <path d="M 79 69 Q 86 71 93 69" stroke="#cbd5e1" stroke-width="0.8" fill="none"/>
+
+          <!-- Warm Smile, Nose & Soft Blush -->
+          <path d="M 69 68 Q 70 71 68 73" stroke="#d97706" stroke-width="1.2" fill="none"/>
+          <circle cx="48" cy="73" r="5.5" fill="#f43f5e" opacity="0.22"/>
+          <circle cx="92" cy="73" r="5.5" fill="#f43f5e" opacity="0.22"/>
+          <path d="M 63 78 Q 70 83 77 78" stroke="#be123c" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+          <!-- Smile lower lip shadow -->
+          <path d="M 67 82 Q 70 84 73 82" stroke="#fb7185" stroke-width="1.2" fill="none"/>
+        </svg>
+      `;
+    }
+
+    function getDaughterSVG(age) {
+      if (age === 1) {
+        // ================= 7yo Cute Anime Daughter =================
+        return `
+          <svg viewBox="0 0 140 220" width="100%" height="100%" style="overflow:visible;">
+            <defs>
+              <radialGradient id="dSkin1" cx="50%" cy="45%" r="55%">
+                <stop offset="0%" stop-color="#fffbf5"/>
+                <stop offset="75%" stop-color="#fed7aa"/>
+                <stop offset="100%" stop-color="#fbcfe8"/>
+              </radialGradient>
+              <linearGradient id="dHair1" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#633112"/>
+                <stop offset="50%" stop-color="#451a03"/>
+                <stop offset="100%" stop-color="#240c02"/>
+              </linearGradient>
+              <linearGradient id="dHairGloss1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(254, 240, 138, 0)"/>
+                <stop offset="50%" stop-color="rgba(254, 240, 138, 0.6)"/>
+                <stop offset="100%" stop-color="rgba(254, 240, 138, 0)"/>
+              </linearGradient>
+              <radialGradient id="dEyeGrad1" cx="50%" cy="35%" r="55%">
+                <stop offset="0%" stop-color="#a5b4fc"/>
+                <stop offset="40%" stop-color="#6366f1"/>
+                <stop offset="80%" stop-color="#312e81"/>
+                <stop offset="100%" stop-color="#0f172a"/>
+              </radialGradient>
+              <radialGradient id="dBlush1" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#f43f5e" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Shadow -->
+            <ellipse cx="70" cy="216" rx="36" ry="5" fill="#000" opacity="0.3"/>
+
+            <!-- Twintails Back Streams -->
+            <path d="M 28 66 Q 4 92 16 138 Q 36 116 42 86 Z" fill="url(#dHair1)"/>
+            <path d="M 112 66 Q 136 92 124 138 Q 104 116 98 86 Z" fill="url(#dHair1)"/>
+            <!-- Twintail Hair Strands Outline -->
+            <path d="M 18 80 Q 8 105 18 135" stroke="#78350f" stroke-width="1.2" fill="none"/>
+            <path d="M 122 80 Q 132 105 122 135" stroke="#78350f" stroke-width="1.2" fill="none"/>
+
+            <!-- Yellow Bow Ribbons -->
+            <circle cx="32" cy="72" r="7" fill="#fbbf24"/>
+            <polygon points="32,72 16,88 26,92" fill="#f59e0b"/>
+            <polygon points="32,72 20,62 26,60" fill="#f59e0b"/>
+            <circle cx="108" cy="72" r="7" fill="#fbbf24"/>
+            <polygon points="108,72 124,88 114,92" fill="#f59e0b"/>
+            <polygon points="108,72 120,62 114,60" fill="#f59e0b"/>
+
+            <!-- Pink Pinafore Dress with Frilled Lace -->
+            <path d="M 44 108 L 96 108 L 110 190 L 30 190 Z" fill="#f472b6"/>
+            <!-- Dress Pleat Shadows -->
+            <path d="M 50 140 L 45 190" stroke="#db2777" stroke-width="1.5"/>
+            <path d="M 70 140 L 70 190" stroke="#db2777" stroke-width="1.5"/>
+            <path d="M 90 140 L 95 190" stroke="#db2777" stroke-width="1.5"/>
+            <!-- White Frilly Shirt & Bib -->
+            <path d="M 52 108 L 88 108 L 84 142 L 56 142 Z" fill="#ffffff"/>
+            <circle cx="70" cy="120" r="2.5" fill="#f472b6"/>
+            <circle cx="70" cy="132" r="2.5" fill="#f472b6"/>
+            <path d="M 30 186 Q 70 196 110 186 L 110 190 Q 70 200 30 190 Z" fill="#ffffff"/>
+
+            <!-- Legs & Shoes -->
+            <rect x="52" y="190" width="10" height="24" fill="#fef08a"/>
+            <rect x="78" y="190" width="10" height="24" fill="#fef08a"/>
+            <ellipse cx="57" cy="216" rx="8" ry="4.5" fill="#1e1b4b"/>
+            <ellipse cx="83" cy="216" rx="8" ry="4.5" fill="#1e1b4b"/>
+            <ellipse cx="57" cy="214" rx="4" ry="2" fill="#e2e8f0"/>
+            <ellipse cx="83" cy="214" rx="4" ry="2" fill="#e2e8f0"/>
+
+            <!-- Cute Rounded Anime Face -->
+            <ellipse cx="70" cy="68" rx="30" ry="28" fill="url(#dSkin1)"/>
+
+            <!-- Hair Back Dome & Angel Ring Shine -->
+            <path d="M 40 62 Q 70 26 100 62 Q 90 44 70 44 Q 50 44 40 62 Z" fill="url(#dHair1)"/>
+            <ellipse cx="70" cy="40" rx="22" ry="6" fill="url(#dHairGloss1)"/>
+
+            <!-- Front Bangs with Anime Strands -->
+            <path d="M 40 60 Q 55 74 70 64 Q 85 74 100 60 Q 88 48 70 48 Q 52 48 40 60 Z" fill="url(#dHair1)"/>
+            <path d="M 46 62 Q 52 70 56 70 Q 54 62 50 56" fill="#361706"/>
+            <path d="M 84 62 Q 88 70 94 70 Q 90 62 86 56" fill="#361706"/>
+
+            <!-- Big Sparkling Anime Eyes (Full Shading & Double Catchlights) -->
+            <!-- Left Eye -->
+            <path d="M 48 64 Q 56 59 64 64" stroke="#1e1b4b" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+            <ellipse cx="56" cy="71" rx="6.5" ry="8" fill="url(#dEyeGrad1)"/>
+            <circle cx="56" cy="71" r="3.2" fill="#0f172a"/>
+            <!-- Catchlights & Star Sparkle -->
+            <circle cx="58.5" cy="68" r="2.4" fill="#ffffff"/>
+            <circle cx="53.5" cy="74" r="1.3" fill="#ffffff"/>
+            <polygon points="56,76 57,74 58,76 57,78" fill="#e0e7ff"/>
+
+            <!-- Right Eye -->
+            <path d="M 76 64 Q 84 59 92 64" stroke="#1e1b4b" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+            <ellipse cx="84" cy="71" rx="6.5" ry="8" fill="url(#dEyeGrad1)"/>
+            <circle cx="84" cy="71" r="3.2" fill="#0f172a"/>
+            <!-- Catchlights & Star Sparkle -->
+            <circle cx="86.5" cy="68" r="2.4" fill="#ffffff"/>
+            <circle cx="81.5" cy="74" r="1.3" fill="#ffffff"/>
+            <polygon points="84,76 85,74 86,76 85,78" fill="#e0e7ff"/>
+
+            <!-- Rosy Cheek Blush -->
+            <circle cx="49" cy="79" r="7" fill="url(#dBlush1)"/>
+            <circle cx="91" cy="79" r="7" fill="url(#dBlush1)"/>
+
+            <!-- Sweet Open Smile -->
+            <path d="M 64 81 Q 70 87 76 81" stroke="#e11d48" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+            <path d="M 66 82 Q 70 88 74 82 Z" fill="#fda4af"/>
+          </svg>
+        `;
+      } else if (age === 2) {
+        // ================= 14yo Sailor Anime Daughter =================
+        return `
+          <svg viewBox="0 0 140 220" width="100%" height="100%" style="overflow:visible;">
+            <defs>
+              <radialGradient id="dSkin2" cx="50%" cy="45%" r="55%">
+                <stop offset="0%" stop-color="#fffbf5"/>
+                <stop offset="75%" stop-color="#fed7aa"/>
+                <stop offset="100%" stop-color="#fbcfe8"/>
+              </radialGradient>
+              <linearGradient id="dHair2" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#422212"/>
+                <stop offset="50%" stop-color="#2c1408"/>
+                <stop offset="100%" stop-color="#140803"/>
+              </linearGradient>
+              <linearGradient id="dHairGloss2" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(192, 132, 252, 0)"/>
+                <stop offset="50%" stop-color="rgba(216, 180, 254, 0.5)"/>
+                <stop offset="100%" stop-color="rgba(192, 132, 252, 0)"/>
+              </linearGradient>
+              <radialGradient id="dEyeGrad2" cx="50%" cy="35%" r="55%">
+                <stop offset="0%" stop-color="#38bdf8"/>
+                <stop offset="50%" stop-color="#0284c7"/>
+                <stop offset="85%" stop-color="#0369a1"/>
+                <stop offset="100%" stop-color="#082f49"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Shadow -->
+            <ellipse cx="70" cy="216" rx="36" ry="5" fill="#000" opacity="0.3"/>
+
+            <!-- Bob Hair Back Outline -->
+            <path d="M 32 62 Q 18 122 40 144 Q 70 150 100 144 Q 122 122 108 62 Z" fill="url(#dHair2)"/>
+
+            <!-- Sailor Uniform (Seifuku) -->
+            <path d="M 40 108 L 100 108 L 112 192 L 28 192 Z" fill="#1e293b"/>
+            <!-- Pleated Skirt lines -->
+            <line x1="45" y1="145" x2="38" y2="192" stroke="#0f172a" stroke-width="1.5"/>
+            <line x1="60" y1="145" x2="58" y2="192" stroke="#0f172a" stroke-width="1.5"/>
+            <line x1="75" y1="145" x2="77" y2="192" stroke="#0f172a" stroke-width="1.5"/>
+            <line x1="90" y1="145" x2="98" y2="192" stroke="#0f172a" stroke-width="1.5"/>
+
+            <!-- Sailor Collar & Cyan Knot Scarf -->
+            <polygon points="70,144 44,108 96,108" fill="#ffffff"/>
+            <path d="M 44 108 L 70 144 L 96 108" stroke="#0284c7" stroke-width="1.8" fill="none"/>
+            <polygon points="70,132 63,150 77,150" fill="#06b6d4"/>
+            <polygon points="70,148 60,172 70,165 80,172" fill="#0891b2"/>
+
+            <!-- Legs & Shoes -->
+            <rect x="52" y="192" width="10" height="24" fill="#334155"/>
+            <rect x="78" y="192" width="10" height="24" fill="#334155"/>
+            <ellipse cx="57" cy="216" rx="8" ry="4.5" fill="#0f172a"/>
+            <ellipse cx="83" cy="216" rx="8" ry="4.5" fill="#0f172a"/>
+
+            <!-- Face -->
+            <ellipse cx="70" cy="68" rx="28" ry="27" fill="url(#dSkin2)"/>
+
+            <!-- Gloss Arch -->
+            <ellipse cx="70" cy="42" rx="22" ry="6" fill="url(#dHairGloss2)"/>
+
+            <!-- Bangs & Treble Clef Hairclip -->
+            <path d="M 38 58 Q 70 38 102 58 Q 90 74 70 66 Q 50 74 38 58 Z" fill="url(#dHair2)"/>
+            <text x="40" y="54" font-size="15" fill="#c084fc" font-weight="bold" filter="drop-shadow(0 0 4px #c084fc)">♪</text>
+
+            <!-- Expressive Azure Anime Eyes -->
+            <!-- Left Eye -->
+            <path d="M 48 62 Q 56 57 64 62" stroke="#0f172a" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+            <ellipse cx="56" cy="69" rx="5.8" ry="7.2" fill="url(#dEyeGrad2)"/>
+            <circle cx="56" cy="69" r="2.8" fill="#082f49"/>
+            <circle cx="58" cy="66.5" r="2" fill="#ffffff"/>
+            <circle cx="53.5" cy="72" r="1.1" fill="#ffffff"/>
+
+            <!-- Right Eye -->
+            <path d="M 76 62 Q 84 57 92 62" stroke="#0f172a" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+            <ellipse cx="84" cy="69" rx="5.8" ry="7.2" fill="url(#dEyeGrad2)"/>
+            <circle cx="84" cy="69" r="2.8" fill="#082f49"/>
+            <circle cx="86" cy="66.5" r="2" fill="#ffffff"/>
+            <circle cx="81.5" cy="72" r="1.1" fill="#ffffff"/>
+
+            <!-- Soft Blush & Smile -->
+            <circle cx="49" cy="77" r="6" fill="#f43f5e" opacity="0.3"/>
+            <circle cx="91" cy="77" r="6" fill="#f43f5e" opacity="0.3"/>
+            <path d="M 65 80 Q 70 84 75 80" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
+        `;
+      } else if (age === 3) {
+        // ================= 20yo Elegant Anime Daughter =================
+        return `
+          <svg viewBox="0 0 140 220" width="100%" height="100%" style="overflow:visible;">
+            <defs>
+              <radialGradient id="dSkin3" cx="50%" cy="45%" r="55%">
+                <stop offset="0%" stop-color="#fffbf5"/>
+                <stop offset="75%" stop-color="#fed7aa"/>
+                <stop offset="100%" stop-color="#fbcfe8"/>
+              </radialGradient>
+              <linearGradient id="dHair3" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#4e2a14"/>
+                <stop offset="50%" stop-color="#34180a"/>
+                <stop offset="100%" stop-color="#180a04"/>
+              </linearGradient>
+              <linearGradient id="dHairGloss3" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(254, 243, 199, 0)"/>
+                <stop offset="50%" stop-color="rgba(254, 243, 199, 0.45)"/>
+                <stop offset="100%" stop-color="rgba(254, 243, 199, 0)"/>
+              </linearGradient>
+              <radialGradient id="dEyeGrad3" cx="50%" cy="35%" r="55%">
+                <stop offset="0%" stop-color="#c084fc"/>
+                <stop offset="50%" stop-color="#9333ea"/>
+                <stop offset="85%" stop-color="#581c87"/>
+                <stop offset="100%" stop-color="#1e1b4b"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Shadow -->
+            <ellipse cx="70" cy="216" rx="38" ry="5" fill="#000" opacity="0.3"/>
+
+            <!-- Long Layered Hair Cascading Back -->
+            <path d="M 28 58 Q 14 135 40 176 Q 70 184 100 176 Q 126 135 112 58 Z" fill="url(#dHair3)"/>
+            <path d="M 22 100 Q 18 145 36 172" stroke="#5c2d12" stroke-width="1.5" fill="none"/>
+            <path d="M 118 100 Q 122 145 104 172" stroke="#5c2d12" stroke-width="1.5" fill="none"/>
+
+            <!-- Trench Coat (Double Breasted) -->
+            <path d="M 38 106 L 102 106 L 116 198 L 24 198 Z" fill="#d97706"/>
+            <!-- Tortoiseshell Buttons -->
+            <circle cx="82" cy="142" r="3.2" fill="#451a03"/>
+            <circle cx="82" cy="164" r="3.2" fill="#451a03"/>
+            <circle cx="82" cy="186" r="3.2" fill="#451a03"/>
+
+            <!-- Cozy Knit Wool Scarf Wrapped around Neck -->
+            <ellipse cx="70" cy="115" rx="26" ry="14" fill="#fef3c7"/>
+            <path d="M 60 115 L 58 155 L 76 155 L 74 115 Z" fill="#fef3c7"/>
+            <!-- Knit lines -->
+            <line x1="64" y1="125" x2="72" y2="125" stroke="#fde68a" stroke-width="1.2"/>
+            <line x1="63" y1="138" x2="71" y2="138" stroke="#fde68a" stroke-width="1.2"/>
+            <line x1="62" y1="150" x2="70" y2="150" stroke="#fde68a" stroke-width="1.2"/>
+
+            <!-- Legs & Boots -->
+            <rect x="52" y="198" width="10" height="20" fill="#451a03"/>
+            <rect x="78" y="198" width="10" height="20" fill="#451a03"/>
+            <ellipse cx="57" cy="216" rx="7.5" ry="4" fill="#1c1917"/>
+            <ellipse cx="83" cy="216" rx="7.5" ry="4" fill="#1c1917"/>
+
+            <!-- Face -->
+            <ellipse cx="70" cy="68" rx="27" ry="27" fill="url(#dSkin3)"/>
+
+            <!-- Gloss Ring -->
+            <ellipse cx="70" cy="40" rx="22" ry="6" fill="url(#dHairGloss3)"/>
+
+            <!-- Bangs -->
+            <path d="M 40 58 Q 70 38 100 58 Q 86 76 70 68 Q 54 76 40 58 Z" fill="url(#dHair3)"/>
+
+            <!-- Deep Amethyst Anime Eyes with Glistening Tears -->
+            <!-- Left Eye -->
+            <path d="M 48 61 Q 56 56 64 61" stroke="#1e1b4b" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+            <ellipse cx="56" cy="68" rx="5.5" ry="7" fill="url(#dEyeGrad3)"/>
+            <circle cx="56" cy="68" r="2.8" fill="#1e1b4b"/>
+            <circle cx="58" cy="65.5" r="1.8" fill="#ffffff"/>
+            <!-- Tear Drop -->
+            <circle cx="51" cy="74" r="2.2" fill="#38bdf8" opacity="0.95"/>
+            <path d="M 51 72 Q 50 78 52 82" stroke="#38bdf8" stroke-width="1" fill="none"/>
+
+            <!-- Right Eye -->
+            <path d="M 76 61 Q 84 56 92 61" stroke="#1e1b4b" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+            <ellipse cx="84" cy="68" rx="5.5" ry="7" fill="url(#dEyeGrad3)"/>
+            <circle cx="84" cy="68" r="2.8" fill="#1e1b4b"/>
+            <circle cx="86" cy="65.5" r="1.8" fill="#ffffff"/>
+            <!-- Tear Drop -->
+            <circle cx="89" cy="74" r="2.2" fill="#38bdf8" opacity="0.95"/>
+            <path d="M 89 72 Q 90 78 88 82" stroke="#38bdf8" stroke-width="1" fill="none"/>
+
+            <!-- Warm Emotional Smile -->
+            <circle cx="48" cy="76" r="5.5" fill="#f43f5e" opacity="0.32"/>
+            <circle cx="92" cy="76" r="5.5" fill="#f43f5e" opacity="0.32"/>
+            <path d="M 65 79 Q 70 83 75 79" stroke="#e11d48" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+          </svg>
+        `;
+      } else {
+        // ================= Final Starlight Angel Form =================
+        return `
+          <svg viewBox="0 0 140 220" width="100%" height="100%" style="overflow:visible;">
+            <defs>
+              <radialGradient id="starAura" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#fef08a" stop-opacity="0.95"/>
+                <stop offset="50%" stop-color="#f472b6" stop-opacity="0.5"/>
+                <stop offset="85%" stop-color="#a855f7" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="dEyeGrad4" cx="50%" cy="35%" r="55%">
+                <stop offset="0%" stop-color="#fbcfe8"/>
+                <stop offset="40%" stop-color="#f472b6"/>
+                <stop offset="80%" stop-color="#9333ea"/>
+                <stop offset="100%" stop-color="#1e1b4b"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Celestial Aura -->
+            <circle cx="70" cy="110" r="70" fill="url(#starAura)"/>
+            <text x="30" y="40" font-size="14" fill="#fef08a" opacity="0.8">✦</text>
+            <text x="100" y="50" font-size="16" fill="#fef08a" opacity="0.9">✧</text>
+            <text x="20" y="160" font-size="12" fill="#fbcfe8" opacity="0.7">✦</text>
+            <text x="115" y="150" font-size="14" fill="#fbcfe8" opacity="0.8">✧</text>
+
+            <!-- Flowing Heavenly Hair -->
+            <path d="M 26 58 Q 10 130 38 174 Q 70 184 102 174 Q 130 130 114 58 Z" fill="#701a75" opacity="0.9"/>
+
+            <!-- Pure White Celestial Dress -->
+            <path d="M 42 105 L 98 105 L 118 202 L 22 202 Z" fill="#ffffff" opacity="0.95"/>
+            <polygon points="70,118 36,198 104,198" fill="#fef08a" opacity="0.45"/>
+
+            <!-- Face -->
+            <ellipse cx="70" cy="66" rx="27" ry="27" fill="#fffbeb"/>
+
+            <!-- Bangs -->
+            <path d="M 42 58 Q 70 38 98 58 Q 86 74 70 66 Q 54 74 42 58 Z" fill="#701a75"/>
+
+            <!-- Eyes -->
+            <path d="M 48 59 Q 56 54 64 59" stroke="#1e1b4b" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+            <ellipse cx="56" cy="66" rx="5.5" ry="7" fill="url(#dEyeGrad4)"/>
+            <circle cx="58" cy="63.5" r="2" fill="#ffffff"/>
+            <circle cx="53" cy="72" r="2.8" fill="#38bdf8"/>
+
+            <path d="M 76 59 Q 84 54 92 59" stroke="#1e1b4b" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+            <ellipse cx="84" cy="66" rx="5.5" ry="7" fill="url(#dEyeGrad4)"/>
+            <circle cx="86" cy="63.5" r="2" fill="#ffffff"/>
+            <circle cx="87" cy="72" r="2.8" fill="#38bdf8"/>
+
+            <!-- Radiant Smile -->
+            <path d="M 64 78 Q 70 84 76 78" stroke="#f43f5e" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+          </svg>
+        `;
+      }
+    }
+
+    function updateDaughterVisual(chapter) {
+      const nameplate = document.getElementById('actor-nameplate');
+      const emote = document.getElementById('actor-emote-icon');
+      const spriteBox = document.getElementById('actor-sprite-box');
+      if (!spriteBox) return;
+
+      if (chapter === 1) {
+        if (nameplate) nameplate.textContent = '딸 강하은 (7세)';
+        if (emote) emote.textContent = '🌸';
+        spriteBox.innerHTML = getDaughterSVG(1);
+      } else if (chapter === 2) {
+        if (nameplate) nameplate.textContent = '딸 강하은 (14세)';
+        if (emote) emote.textContent = '🎶';
+        spriteBox.innerHTML = getDaughterSVG(2);
+      } else if (chapter === 3) {
+        if (nameplate) nameplate.textContent = '딸 강하은 (20세)';
+        if (emote) emote.textContent = '🍂';
+        spriteBox.innerHTML = getDaughterSVG(3);
+      } else if (chapter === 4) {
+        if (nameplate) nameplate.textContent = '하은 (진실의 기억)';
+        if (emote) emote.textContent = '💖';
+        spriteBox.innerHTML = getDaughterSVG(4);
+      }
+    }
+
+    function interactWithDaughter() {
+      playSFX('lens');
+      if (gameState.chapter === 1) {
+        setDialogue('딸 강하은 (7세)', '🌸', '"아빠! 우리 자전거 타러 언제 가요? 책상 서랍의 [돋보기 렌즈]로 과거를 비춰보세요!"');
+      } else if (gameState.chapter === 2) {
+        setDialogue('딸 강하은 (14세)', '🎹', '"아빠... 나 피아노 정말 잘 치고 싶었는데... 항상 투정만 부려서 미안해요. [도-미-솔-라]를 기억해 줘요."');
+      } else if (gameState.chapter === 3) {
+        setDialogue('딸 강하은 (20세)', '🧥', '"아빠, 혼자 아프지 마요... 제가 어른이 돼서 아빠를 꼭 지켜드릴게요."');
+      } else if (gameState.chapter === 4) {
+        setDialogue('딸 강하은', '💖', '"아빠... 내 아빠가 되어줘서 정말 고마웠어요. 사랑해요, 영원히."');
+      }
+    }
+
+    function toggleMemoryLens() {
+      if (!gameState.hasLens) {
+        playSFX('error');
+        setDialogue('딸 강하은 (7세)', '🔍', '아직 [기억의 렌즈]가 없어요! 서재 책상 서랍을 먼저 조사해보세요.');
+        return;
+      }
+
+      gameState.lensActive = !gameState.lensActive;
+      playSFX('lens');
+      const stage = document.getElementById('stage-room');
+      const btn = document.getElementById('hud-lens-btn');
+
+      if (gameState.lensActive) {
+        stage.classList.add('lens-mode-active');
+        btn.classList.add('active');
+        btn.innerHTML = '🔍 기억의 렌즈 ON';
+        setDialogue('기억의 렌즈', '✨', '과거의 따뜻한 기억들이 영롱한 잔상으로 공간에 겹쳐 보입니다.');
+      } else {
+        stage.classList.remove('lens-mode-active');
+        btn.classList.remove('active');
+        btn.innerHTML = '🔍 기억의 렌즈 OFF';
+      }
+    }
+
+    // ================= INVENTORY HELPERS =================
+    function addItem(name, icon, desc) {
+      if (gameState.inventory.some(item => item.name === name)) return;
+      gameState.inventory.push({ name, icon, desc });
+      playSFX('unlock');
+      renderInventory();
+    }
+
+    function renderInventory() {
+      const container = document.getElementById('inv-container');
+      container.innerHTML = '';
+      for (let i = 0; i < 5; i++) {
+        const item = gameState.inventory[i];
+        const slot = document.createElement('div');
+        slot.className = 'inv-slot' + (item ? ' filled' : '');
+        if (item) {
+          slot.innerHTML = `<span>${item.icon}</span><span class="inv-tooltip">${item.name}: ${item.desc}</span>`;
+        } else {
+          slot.innerHTML = `<span class="inv-tooltip">비어있음</span>`;
+        }
+        container.appendChild(slot);
+      }
+    }
+
+    function openModal(id) {
+      playSFX('click');
+      document.getElementById(id).classList.add('show');
+    }
+    function closeModal(id) {
+      playSFX('click');
+      document.getElementById(id).classList.remove('show');
+    }
+
+    // ================= CHAPTER 1 LOGIC =================
+    function inspectDesk() {
+      playSFX('click');
+      if (!gameState.hasLens) {
+        gameState.hasLens = true;
+        gameState.ch1.gotCrayonClue = true;
+        addItem('돋보기 렌즈', '🔍', '과거의 기억을 비출 수 있는 특수 렌즈');
+        const lensBtn = document.getElementById('hud-lens-btn');
+        lensBtn.classList.remove('locked');
+        lensBtn.innerHTML = '🔍 기억의 렌즈 OFF';
+        setDialogue('딸 강하은 (7세)', '🔍', '서랍에서 [돋보기 렌즈]를 찾았어요! (달력에 아빠의 퇴근 시간 [07:30]도 적혀있어요!)');
+        const tag = document.getElementById('hs-desk-tag');
+        if (tag) tag.textContent = '서재 책상 (달력: 07:30)';
+      } else {
+        setDialogue('딸 강하은 (7세)', '🌸', '책상 달력에 아빠의 퇴근 시간 [저녁 07:30]이 선명하게 적혀있어요!');
+      }
+    }
+
+    function inspectDrawing() {
+      playSFX('lens');
+      setDialogue('과거의 기억 (7세)', '🖍️', '"아빠 생일 축하해요! 5월 24일 최고 멋진 우리 아빠!" - 생일 날짜 [0524]가 적혀있습니다.');
+    }
+
+    function openClockPuzzle() {
+      if (gameState.ch1.clockSolved) return;
+      openModal('modal-clock');
+    }
+
+    function adjustTime(type, delta) {
+      playSFX('click');
+      if (type === 'hour') {
+        gameState.ch1.hour = (gameState.ch1.hour + delta + 12) % 12 || 12;
+        document.getElementById('disp-hour').textContent = String(gameState.ch1.hour).padStart(2, '0');
+      } else {
+        gameState.ch1.min = (gameState.ch1.min + delta + 60) % 60;
+        document.getElementById('disp-min').textContent = String(gameState.ch1.min).padStart(2, '0');
+      }
+    }
+
+    function checkClockPuzzle() {
+      // Correct time is 07:30 (퇴근 시간)
+      if (gameState.ch1.hour === 7 && gameState.ch1.min === 30) {
+        gameState.ch1.clockSolved = true;
+        closeModal('modal-clock');
+        playSFX('unlock');
+        setDialogue('딸 강하은 (7세)', '🕰️', '딸깍! 시계가 맞춰졌어요! "아빠가 오던 7시 30분을 전 늘 기다렸어요." (시계 완료 ✓)');
+        
+        const hs = document.getElementById('hs-clock');
+        if (hs) hs.classList.add('solved');
+        const tag = document.getElementById('hs-clock-tag');
+        if (tag) tag.textContent = '✓ 괘종시계 (완료)';
+      } else {
+        playSFX('error');
+        setDialogue('딸 강하은 (7세)', '🕰️', '시간이 맞지 않아요. 아빠가 퇴근하던 저녁 시간 [07 : 30]으로 맞춰보세요!');
+      }
+    }
+
+    function openBikePuzzle() {
+      if (gameState.ch1.bikeSolved) return;
+      openModal('modal-bike');
+    }
+
+    function adjustDial(dialId, delta) {
+      playSFX('click');
+      const el = document.getElementById(dialId);
+      if (!el) return;
+      const currentVal = parseInt(el.textContent, 10) || 0;
+      const nextVal = (currentVal + delta + 10) % 10;
+      el.textContent = nextVal;
+      if (gameState.ch1[dialId] !== undefined) {
+        gameState.ch1[dialId] = nextVal;
+      }
+      if (gameState.ch3[dialId] !== undefined) {
+        gameState.ch3[dialId] = nextVal;
+      }
+    }
+
+    function checkBikeLock() {
+      const code = `${gameState.ch1.d1}${gameState.ch1.d2}${gameState.ch1.d3}${gameState.ch1.d4}`;
+      if (code === '0524') {
+        gameState.ch1.bikeSolved = true;
+        closeModal('modal-bike');
+        
+        const hs = document.getElementById('hs-bike');
+        if (hs) hs.classList.add('solved');
+        const tag = document.getElementById('hs-bike-tag');
+        if (tag) tag.textContent = '✓ 분홍 자전거 (완료)';
+
+        // Trigger emotional father flashback
+        triggerFlashback('ch1', () => {
+          addItem('종이 메달', '🥇', '7살 하은이가 색종이로 접어준 세상에서 제일 멋진 아빠 메달');
+          setDialogue('딸 강하은 (7세)', '🚲', '자물쇠가 풀렸어요! 바구니 속 [종이 메달]을 아빠에게 드릴게요! (자전거 완료 ✓)');
+        });
+      } else {
+        playSFX('error');
+        setDialogue('딸 강하은 (7세)', '🚲', '비밀번호가 틀렸어요. 렌즈로 비춰본 그림 속 아빠 생일 날짜 [0524]예요!');
+      }
+    }
+
+    function tryEscapeDoor() {
+      const clockCheck = gameState.ch1.clockSolved ? '✓ 시계 완료' : '✗ 괘종시계(07:30)';
+      const bikeCheck = gameState.ch1.bikeSolved ? '✓ 자전거 완료' : '✗ 자전거(0524)';
+
+      if (gameState.ch1.clockSolved && gameState.ch1.bikeSolved) {
+        playSFX('unlock');
+        document.getElementById('ch1-door-icon').textContent = '🚪✨';
+        setDialogue('딸 강하은 (7세)', '🌸', '"아빠, 자전거 태워줘서 고마워요!" - 문이 열리며 14세 기억으로 이동합니다!');
+        setTimeout(() => enterChapter2(), 1200);
+      } else {
+        playSFX('error');
+        setDialogue('딸 강하은 (7세)', '🚪', `문이 아직 잠겨있어요! [상태: ${clockCheck} | ${bikeCheck}]`);
+      }
+    }
+
+    // ================= CHAPTER 2 LOGIC =================
+    function enterChapter2() {
+      gameState.chapter = 2;
+      document.getElementById('layer-chapter-1').style.display = 'none';
+      document.getElementById('layer-chapter-2').style.display = 'block';
+      document.getElementById('hud-chapter-badge').textContent = 'CH 2';
+      document.getElementById('hud-chapter-title').textContent = '비 내리는 온실과 피아노 (14세)';
+      updateDaughterVisual(2);
+      setDialogue('딸 강하은 (14세)', '🎹', '빗소리가 들리는 온실이야... 아빠, 그때 콩쿠르 때문에 너무 투정 부려서 미안해요...');
+    }
+
+    function inspectFlowerPot() {
+      playSFX('click');
+      if (!gameState.inventory.some(i => i.name === '조율 렌치')) {
+        addItem('조율 렌치', '🔧', '피아노 조율용 황동 렌치');
+        setDialogue('딸 강하은 (14세)', '🪴', '화분 흙 속에서 [피아노 조율 렌치]를 찾았어요.');
+        const tag = document.getElementById('hs-plant-tag');
+        if (tag) tag.textContent = '비에 젖은 화분 (조사완료)';
+      } else {
+        setDialogue('딸 강하은 (14세)', '🪴', '비에 젖은 화분이에요. 이미 [조율 렌치]를 챙겼어요.');
+      }
+    }
+
+    function inspectGhostScore() {
+      playSFX('lens');
+      if (!gameState.ch2.gotScore) {
+        gameState.ch2.gotScore = true;
+        addItem('미완성 악보', '🎼', '하은이가 아빠와 함께 치려고 만든 악보 [도 - 미 - 솔 - 라]');
+      }
+      setDialogue('딸 강하은 (14세)', '🎼', '"아빠랑 둘이서 완성하고 싶었던 곡... 피아노로 [도 - 미 - 솔 - 라]를 연주해 줘요."');
+    }
+
+    function openPianoPuzzle() {
+      if (gameState.ch2.pianoSolved) return;
+      openModal('modal-piano');
+    }
+
+    function playKey(noteName, freq) {
+      playTone(freq, 'sine', 0.5, 0.3);
+      gameState.ch2.pianoSequence.push(noteName);
+      document.getElementById('piano-input-display').textContent = '연주된 음계 : ' + gameState.ch2.pianoSequence.join(' → ');
+
+      if (gameState.ch2.pianoSequence.length === 4) {
+        const played = gameState.ch2.pianoSequence.join('-');
+        if (played === '도-미-솔-라') {
+          gameState.ch2.pianoSolved = true;
+          playSFX('unlock');
+          closeModal('modal-piano');
+
+          const hs = document.getElementById('hs-piano');
+          if (hs) hs.classList.add('solved');
+          const tag = document.getElementById('hs-piano-tag');
+          if (tag) tag.textContent = '✓ 업라이트 피아노 (완료)';
+
+          // Trigger emotional piano flashback
+          triggerFlashback('ch2', () => {
+            addItem('화해의 음표', '🎵', '부녀가 함께 완성한 따뜻한 피아노 멜로디');
+            setDialogue('딸 강하은 (14세)', '🎹', '"아빠, 사실 화내서 미안했어요..." - 피아노에서 빛이 뿜어져 나오며 온실 덩굴이 걷힙니다.');
+            document.getElementById('ch2-door-icon').textContent = '🌿🚪✨';
+          });
+        } else {
+          playSFX('error');
+          setTimeout(() => resetPianoInput(), 700);
+        }
+      }
+    }
+
+    function resetPianoInput() {
+      gameState.ch2.pianoSequence = [];
+      document.getElementById('piano-input-display').textContent = '연주된 음계 : [ 대기 중 ]';
+    }
+
+    function tryEscapeDoor2() {
+      if (gameState.ch2.pianoSolved) {
+        playSFX('unlock');
+        setDialogue('딸 강하은 (14세)', '🚪', '비가 그치고 무지개가 떠오르며 다음 기억의 문이 열립니다.');
+        setTimeout(() => enterChapter3(), 1200);
+      } else {
+        playSFX('error');
+        setDialogue('딸 강하은 (14세)', '🚪', '온실 문이 덩굴로 막혀있어요. 피아노 연주 [도-미-솔-라]를 완성해야 해요.');
+      }
+    }
+
+    // ================= CHAPTER 3 LOGIC =================
+    function enterChapter3() {
+      gameState.chapter = 3;
+      document.getElementById('layer-chapter-2').style.display = 'none';
+      document.getElementById('layer-chapter-3').style.display = 'block';
+      document.getElementById('hud-chapter-badge').textContent = 'CH 3';
+      document.getElementById('hud-chapter-title').textContent = '빛바랜 병실의 서재 (20세)';
+      updateDaughterVisual(3);
+      setDialogue('딸 강하은 (20세)', '🧥', '대학 졸업하고 독립하던 날의 방이에요... 아빠의 코트와 금고를 확인해 주세요.');
+    }
+
+    function inspectCoat() {
+      playSFX('click');
+      if (!gameState.ch3.gotPrescription) {
+        gameState.ch3.gotPrescription = true;
+        addItem('낡은 처방전', '📜', '아빠의 불치병 진단서와 딸의 졸업식 날짜 [1020]');
+      }
+      setDialogue('딸 강하은 (20세)', '📜', '코트 안주머니의 처방전... "아빠의 불치병 진단서와 내 대학 졸업식 날짜 [10월 20일]이 적혀있어요."');
+    }
+
+    function inspectPhotoDesk() {
+      playSFX('click');
+      if (!gameState.inventory.some(i => i.name === '졸업식 사진')) {
+        addItem('졸업식 사진', '📷', '졸업식 날 딸 몰래 뒤에서 지켜보며 울던 아빠의 폴라로이드 사진');
+      }
+      setDialogue('딸 강하은 (20세)', '📷', '환하게 웃는 내 뒤에서 홀로 눈물을 닦는 아빠의 모습이 찍혀있어요...');
+    }
+
+    function openSafePuzzle() {
+      if (gameState.ch3.safeSolved) return;
+      openModal('modal-safe');
+    }
+
+    function checkSafeCode() {
+      const code = `${document.getElementById('s1').textContent}${document.getElementById('s2').textContent}${document.getElementById('s3').textContent}${document.getElementById('s4').textContent}`;
+      if (code === '1020') {
+        gameState.ch3.safeSolved = true;
+        closeModal('modal-safe');
+        playSFX('unlock');
+
+        const hs = document.getElementById('hs-safe');
+        if (hs) hs.classList.add('solved');
+        const tag = document.getElementById('hs-safe-tag');
+        if (tag) tag.textContent = '✓ 비밀 금고 (완료)';
+
+        // Trigger emotional departure flashback
+        triggerFlashback('ch3', () => {
+          addItem('전하지 못한 편지', '💌', '"하은아, 널 위해 일평생을 살아온 시간이 아빠에겐 가장 큰 축복이었단다."');
+          setDialogue('딸 강하은 (20세)', '💌', '금고 속 아빠의 편지... "하은아, 널 위한 일평생이 아빠에겐 가장 큰 축복이었단다."');
+          document.getElementById('ch3-door-icon').textContent = '🚪✨';
+        });
+      } else {
+        playSFX('error');
+        setDialogue('딸 강하은 (20세)', '🗄️', '비밀번호가 맞지 않아요. 코트 속 처방전의 졸업식 날짜 [1020]이에요.');
+      }
+    }율 렌치', '🔧', '피아노 조율용 황동 렌치');
+      setDialogue('딸 강하은 (14세)', '🪴', '화분 흙 속에서 [피아노 조율 렌치]를 찾았어요.');
+      
+      const hs = document.getElementById('hs-plant');
+      if (hs) hs.classList.add('solved');
+      const tag = document.getElementById('hs-plant-tag');
+      if (tag) tag.textContent = '✓ 비에 젖은 화분 (완료)';
+    }
+
+    function inspectGhostScore() {
+      if (gameState.ch2.gotScore) return;
+      playSFX('lens');
+      gameState.ch2.gotScore = true;
+      addItem('미완성 악보', '🎼', '하은이가 아빠와 함께 치려고 만든 악보 [도 - 미 - 솔 - 라]');
+      setDialogue('딸 강하은 (14세)', '🎼', '"아빠랑 둘이서 완성하고 싶었던 곡... 피아노로 [도 - 미 - 솔 - 라]를 연주해 줘요."');
+      
+      const hs = document.getElementById('hs-score');
+      if (hs) hs.classList.add('solved');
+      const tag = document.getElementById('hs-score-tag');
+      if (tag) tag.textContent = '✓ 찢겨진 악보 (완료)';
+    }
+
+    function openPianoPuzzle() {
+      if (gameState.ch2.pianoSolved) return;
+      openModal('modal-piano');
+    }
+
+    function playKey(noteName, freq) {
+      playTone(freq, 'sine', 0.5, 0.3);
+      gameState.ch2.pianoSequence.push(noteName);
+      document.getElementById('piano-input-display').textContent = '연주된 음계 : ' + gameState.ch2.pianoSequence.join(' → ');
+
+      if (gameState.ch2.pianoSequence.length === 4) {
+        const played = gameState.ch2.pianoSequence.join('-');
+        if (played === '도-미-솔-라') {
+          gameState.ch2.pianoSolved = true;
+          playSFX('unlock');
+          closeModal('modal-piano');
+
+          const hs = document.getElementById('hs-piano');
+          if (hs) hs.classList.add('solved');
+          const tag = document.getElementById('hs-piano-tag');
+          if (tag) tag.textContent = '✓ 업라이트 피아노 (완료)';
+
+          // Trigger emotional piano flashback
+          triggerFlashback('ch2', () => {
+            addItem('화해의 음표', '🎵', '부녀가 함께 완성한 따뜻한 피아노 멜로디');
+            setDialogue('딸 강하은 (14세)', '🎹', '"아빠, 사실 화내서 미안했어요..." - 피아노에서 빛이 뿜어져 나오며 온실 덩굴이 걷힙니다.');
+            document.getElementById('ch2-door-icon').textContent = '🌿🚪✨';
+          });
+        } else {
+          playSFX('error');
+          setTimeout(() => resetPianoInput(), 700);
+        }
+      }
+    }
+
+    function resetPianoInput() {
+      gameState.ch2.pianoSequence = [];
+      document.getElementById('piano-input-display').textContent = '연주된 음계 : [ 대기 중 ]';
+    }
+
+    function tryEscapeDoor2() {
+      if (gameState.ch2.pianoSolved) {
+        playSFX('unlock');
+        setDialogue('딸 강하은 (14세)', '🚪', '비가 그치고 무지개가 떠오르며 다음 기억의 문이 열립니다.');
+        setTimeout(() => enterChapter3(), 1200);
+      } else {
+        playSFX('error');
+        setDialogue('딸 강하은 (14세)', '🚪', '온실 문이 덩굴로 막혀있어요. 피아노 연주 [도-미-솔-라]를 완성해야 해요.');
+      }
+    }
+
+    // ================= CHAPTER 3 LOGIC =================
+    function enterChapter3() {
+      gameState.chapter = 3;
+      document.getElementById('layer-chapter-2').style.display = 'none';
+      document.getElementById('layer-chapter-3').style.display = 'block';
+      document.getElementById('hud-chapter-badge').textContent = 'CH 3';
+      document.getElementById('hud-chapter-title').textContent = '빛바랜 병실의 서재 (20세)';
+      updateDaughterVisual(3);
+      setDialogue('딸 강하은 (20세)', '🧥', '대학 졸업하고 독립하던 날의 방이에요... 아빠의 코트와 금고를 확인해 주세요.');
+    }
+
+    function inspectCoat() {
+      if (gameState.ch3.gotPrescription) return;
+      playSFX('click');
+      gameState.ch3.gotPrescription = true;
+      addItem('낡은 처방전', '📜', '아빠의 불치병 진단서와 딸의 졸업식 날짜 [1020]');
+      setDialogue('딸 강하은 (20세)', '📜', '코트 안주머니의 처방전... "아빠는 이때부터 혼자 아픔을 삼키고 계셨던 거였어요... 날짜는 [10월 20일]이에요."');
+      
+      const hs = document.getElementById('hs-coat');
+      if (hs) hs.classList.add('solved');
+      const tag = document.getElementById('hs-coat-tag');
+      if (tag) tag.textContent = '✓ 아빠의 오래된 코트 (완료)';
+    }
+
+    function inspectPhotoDesk() {
+      if (gameState.inventory.some(i => i.name === '졸업식 사진')) return;
+      playSFX('click');
+      addItem('졸업식 사진', '📷', '졸업식 날 딸 몰래 뒤에서 지켜보며 울던 아빠의 폴라로이드 사진');
+      setDialogue('딸 강하은 (20세)', '📷', '환하게 웃는 내 뒤에서 홀로 눈물을 닦는 아빠의 모습이 찍혀있어요...');
+      
+      const hs = document.getElementById('hs-photo');
+      if (hs) hs.classList.add('solved');
+      const tag = document.getElementById('hs-photo-tag');
+      if (tag) tag.textContent = '✓ 암실 현상대 (완료)';
+    }
+
+    function openSafePuzzle() {
+      if (gameState.ch3.safeSolved) return;
+      openModal('modal-safe');
+    }
+
+    function checkSafeCode() {
+      const code = `${document.getElementById('s1').textContent}${document.getElementById('s2').textContent}${document.getElementById('s3').textContent}${document.getElementById('s4').textContent}`;
+      if (code === '1020') {
+        gameState.ch3.safeSolved = true;
+        closeModal('modal-safe');
+        playSFX('unlock');
+
+        const hs = document.getElementById('hs-safe');
+        if (hs) hs.classList.add('solved');
+        const tag = document.getElementById('hs-safe-tag');
+        if (tag) tag.textContent = '✓ 비밀 금고 (완료)';
+
+        // Trigger emotional departure flashback
+        triggerFlashback('ch3', () => {
+          addItem('전하지 못한 편지', '💌', '"하은아, 널 위해 일평생을 살아온 시간이 아빠에겐 가장 큰 축복이었단다."');
+          setDialogue('딸 강하은 (20세)', '💌', '금고 속 아빠의 편지... "하은아, 널 위한 일평생이 아빠에겐 가장 큰 축복이었단다."');
+          document.getElementById('ch3-door-icon').textContent = '🚪✨';
+        });
+      } else {
+        playSFX('error');
+        setDialogue('딸 강하은 (20세)', '🗄️', '비밀번호가 맞지 않아요. 코트 속 처방전의 졸업식 날짜 [1020]이에요.');
+      }
+    }
+
+    function tryEscapeDoor3() {
+      if (gameState.ch3.safeSolved) {
+        playSFX('unlock');
+        setDialogue('딸 강하은 (20세)', '🚪', '모든 기억의 퍼즐이 맞춰지며 마지막 진실의 문이 열립니다...');
+        setTimeout(() => enterChapter4(), 1200);
+      } else {
+        playSFX('error');
+        setDialogue('딸 강하은 (20세)', '🚪', '비밀 금고 속 마지막 편지를 확인해야 문이 열려요.');
+      }
+    }
+
+    // ================= CHAPTER 4 & FINALE =================
+    function enterChapter4() {
+      gameState.chapter = 4;
+      document.getElementById('layer-chapter-3').style.display = 'none';
+      document.getElementById('layer-chapter-4').style.display = 'block';
+      document.getElementById('hud-chapter-badge').textContent = 'FINAL';
+      document.getElementById('hud-chapter-title').textContent = '은하수가 흐르는 마지막 문 (현재)';
+      updateDaughterVisual(4);
+      setDialogue('딸 강하은', '💖', '아빠... 이제 거의 다 왔어요. 이 마지막 문을 열어주세요...');
+    }
+
+    function openFinaleDialogue() {
+      playSFX('unlock');
+      document.getElementById('ending-screen').style.display = 'flex';
+    }
+
+    function restartGame() {
+      location.reload();
+    }
+
+    // Initialize first chapter visuals
+    updateDaughterVisual(1);
+  </script>
+</body>
+</html>
