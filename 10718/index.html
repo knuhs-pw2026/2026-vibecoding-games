@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>광속 연타 줄다리기: HYPER CLASH (2인용 키보드 대전)</title>
+    <meta name="description" content="한 키보드에서 [A]키와 [L]키를 광속으로 연타하여 승패를 가리는 초박빙 2인용 아케이드 줄다리기 게임">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="screen-overlay"></div>
+
+    <main id="game-container">
+        <!-- TOP HUD -->
+        <header class="hud-header">
+            <!-- Player 1 (Red Corner) -->
+            <div class="player-panel p1">
+                <div class="player-tag p1-text">
+                    <span>PLAYER 1</span>
+                    <span class="key-badge">[A]</span>
+                </div>
+                <div class="stats-row">
+                    <span class="cps-counter p1-text" id="p1-cps">0.0</span>
+                    <span class="cps-label">CPS</span>
+                    <span class="peak-cps" id="p1-peak">PEAK: 0.0</span>
+                </div>
+                <div class="fever-badge" id="p1-fever">⚡ HYPER FEVER ⚡</div>
+            </div>
+
+            <!-- Center Match Status -->
+            <div class="center-hud">
+                <div class="timer-badge" id="match-timer">⏱️ 15.0s</div>
+                <div class="round-stars">
+                    <div class="team-stars" id="p1-stars"></div>
+                    <span class="vs-badge">VS</span>
+                    <div class="team-stars" id="p2-stars"></div>
+                </div>
+                <!-- Tug Tension Bar -->
+                <div class="tension-bar-wrapper">
+                    <div class="tension-fill-p1" id="tension-fill-p1"></div>
+                    <div class="tension-fill-p2" id="tension-fill-p2"></div>
+                    <div class="tension-marker" id="tension-marker"></div>
+                </div>
+            </div>
+
+            <!-- Player 2 (Blue Corner) -->
+            <div class="player-panel p2">
+                <div class="player-tag p2-text">
+                    <span class="key-badge">[L]</span>
+                    <span id="p2-tag-name">PLAYER 2</span>
+                </div>
+                <div class="stats-row">
+                    <span class="peak-cps" id="p2-peak">PEAK: 0.0</span>
+                    <span class="cps-counter p2-text" id="p2-cps">0.0</span>
+                    <span class="cps-label">CPS</span>
+                </div>
+                <div class="fever-badge" id="p2-fever">⚡ HYPER FEVER ⚡</div>
+            </div>
+        </header>
+
+        <!-- GAME CANVAS -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- COUNTDOWN OVERLAY -->
+        <div id="countdown-overlay" style="display: none;">
+            <span class="countdown-text" id="countdown-text">3</span>
+        </div>
+
+        <!-- MOBILE TOUCH ZONES -->
+        <div class="touch-zone left" id="touch-left">
+            <button class="touch-btn" id="btn-touch-p1" aria-label="Player 1 Tap">
+                TAP [A]
+                <span>(연타!)</span>
+            </button>
+        </div>
+        <div class="touch-zone right" id="touch-right">
+            <button class="touch-btn" id="btn-touch-p2" aria-label="Player 2 Tap">
+                TAP [L]
+                <span>(연타!)</span>
+            </button>
+        </div>
+
+        <!-- BOTTOM CONTROLS & TIPS -->
+        <footer class="bottom-bar">
+            <div class="control-tip">⌨️ 1P: <b>[A]</b> 키 연타 | 2P: <b>[L]</b> 키 연타</div>
+            <button class="btn-icon" id="sound-btn" aria-label="Toggle Audio">🔊 SOUND: ON</button>
+        </footer>
+
+        <!-- START / MODE SELECT MODAL -->
+        <div class="modal-backdrop" id="start-modal">
+            <div class="card-modal">
+                <h1 class="modal-title">HYPER CLASH</h1>
+                <p class="modal-subtitle">2인용 키보드 광속 연타 줄다리기</p>
+
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="2P" id="mode-2p-btn">
+                        <span>👥 2인 로컬 대전 (1 vs 1)</span>
+                        <small style="opacity: 0.7;">1P [A] vs 2P [L]</small>
+                    </button>
+                    <button class="mode-btn" data-mode="AI" id="mode-ai-btn">
+                        <span>🤖 1인 vs AI 봇 대전</span>
+                        <small style="opacity: 0.7;">혼자서 광속 봇과 대결</small>
+                    </button>
+                </div>
+
+                <div class="difficulty-group" id="diff-selector" style="display: none;">
+                    <button class="diff-btn" data-diff="EASY">EASY (~5 CPS)</button>
+                    <button class="diff-btn active" data-diff="NORMAL">NORMAL (~8 CPS)</button>
+                    <button class="diff-btn" data-diff="HARD">HARD (~12 CPS)</button>
+                    <button class="diff-btn" data-diff="INSANE">INSANE (~16 CPS)</button>
+                </div>
+
+                <!-- Match Round Rule (1판 1선승제 기본) -->
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 0.9rem; color: #8c9cb3; margin-bottom: 8px;">경기 방식</div>
+                    <div class="difficulty-group" id="round-selector">
+                        <button class="diff-btn active" data-rounds="1">⚡ 1판 1선승 (단판 승부)</button>
+                        <button class="diff-btn" data-rounds="3">3판 2선승</button>
+                        <button class="diff-btn" data-rounds="5">5판 3선승</button>
+                    </div>
+                </div>
+
+                <button class="primary-btn" id="start-btn">경기 시작 (READY)</button>
+            </div>
+        </div>
+
+        <!-- VICTORY / GAME OVER MODAL -->
+        <div class="modal-backdrop hidden" id="victory-modal">
+            <div class="card-modal">
+                <h2 class="modal-title" id="victory-title">🏆 PLAYER 1 WINS!</h2>
+                <p class="modal-subtitle">경기 통계 및 연타 기록</p>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-title p1-text">P1 총 연타수</span>
+                        <span class="stat-value p1-text" id="stat-p1-taps">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-title p2-text">P2 총 연타수</span>
+                        <span class="stat-value p2-text" id="stat-p2-taps">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-title p1-text">P1 최고 속도</span>
+                        <span class="stat-value" id="stat-p1-peak">0.0 CPS</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-title p2-text">P2 최고 속도</span>
+                        <span class="stat-value" id="stat-p2-peak">0.0 CPS</span>
+                    </div>
+                </div>
+
+                <button class="primary-btn" id="rematch-btn">다시 대결하기 (REMATCH)</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="audio.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
