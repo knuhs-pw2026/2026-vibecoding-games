@@ -1,0 +1,147 @@
+/* ==========================================================================
+   effects.css - 호러 비주얼 이펙트 (글리치, 오염 비네팅, CRT 스캔라인, 흔들림)
+   ========================================================================== */
+
+/* 1. CRT 스캔라인 및 노이즈 오버레이 */
+.crt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none !important;
+    user-select: none;
+    z-index: 999;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.25) 50%
+    ), linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 0.03),
+        rgba(0, 255, 0, 0.01),
+        rgba(0, 0, 255, 0.03)
+    );
+    background-size: 100% 3px, 3px 100%;
+    opacity: 0.75;
+}
+
+/* 2. 오염도 침식 비네팅 (Contamination Vignette) */
+#vignette-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none !important;
+    user-select: none;
+    z-index: 998;
+    transition: all 0.6s ease;
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.8);
+}
+
+/* 오염도 30% 이상 */
+.vignette-warn {
+    box-shadow: inset 0 0 80px rgba(225, 29, 72, 0.35) !important;
+}
+
+/* 오염도 60% 이상 (위험) */
+.vignette-danger {
+    box-shadow: inset 0 0 130px rgba(225, 29, 72, 0.65), inset 0 0 60px rgba(0, 0, 0, 0.9) !important;
+    animation: pulseVignette 1.5s infinite alternate;
+}
+
+/* 오염도 90% 이상 (치명적) */
+.vignette-critical {
+    box-shadow: inset 0 0 180px rgba(225, 29, 72, 0.85), inset 0 0 100px rgba(0, 0, 0, 0.95) !important;
+    animation: pulseCritical 0.8s infinite alternate;
+}
+
+@keyframes pulseVignette {
+    0% { transform: scale(1); opacity: 0.7; }
+    100% { transform: scale(1.02); opacity: 1; }
+}
+
+@keyframes pulseCritical {
+    0% { transform: scale(1); opacity: 0.85; filter: contrast(110%); }
+    100% { transform: scale(1.04); opacity: 1; filter: contrast(140%) hue-rotate(-15deg); }
+}
+
+/* 3. 화면 흔들림 효과 (Screen Shake) */
+.shake {
+    animation: screenShake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes screenShake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* 4. 텍스트 글리치 효과 */
+.glitch-text {
+    position: relative;
+    display: inline-block;
+    color: #fff;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    clip: rect(0, 0, 0, 0);
+}
+
+.glitch-active::before {
+    left: -2px;
+    text-shadow: 2px 0 var(--text-danger);
+    animation: glitch-anim-1 0.6s infinite linear alternate-reverse;
+}
+
+.glitch-active::after {
+    left: 2px;
+    text-shadow: -2px 0 var(--text-teal);
+    animation: glitch-anim-2 0.6s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-1 {
+    0% { clip: rect(10px, 9999px, 30px, 0); }
+    20% { clip: rect(40px, 9999px, 50px, 0); }
+    40% { clip: rect(15px, 9999px, 70px, 0); }
+    60% { clip: rect(55px, 9999px, 85px, 0); }
+    80% { clip: rect(25px, 9999px, 45px, 0); }
+    100% { clip: rect(70px, 9999px, 90px, 0); }
+}
+
+@keyframes glitch-anim-2 {
+    0% { clip: rect(35px, 9999px, 60px, 0); }
+    20% { clip: rect(5px, 9999px, 20px, 0); }
+    40% { clip: rect(75px, 9999px, 95px, 0); }
+    60% { clip: rect(20px, 9999px, 40px, 0); }
+    80% { clip: rect(60px, 9999px, 80px, 0); }
+    100% { clip: rect(10px, 9999px, 30px, 0); }
+}
+
+/* 5. 붉은 섬광 (Red Flash) */
+.flash-danger {
+    animation: flashRed 0.5s ease-out;
+}
+
+@keyframes flashRed {
+    0% { background-color: rgba(225, 29, 72, 0.4); }
+    100% { background-color: transparent; }
+}
+
+/* 6. 페이드인 전환 */
+.fade-in {
+    animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
